@@ -84,7 +84,7 @@ class IndexHandler(tornado.web.RequestHandler):
                      ".replace(\"https\", \"wss\") + \"ws\"}</script></body>"
 
 
-        self.write(f"{self.text}<p><a href=\"https://github.com/zRitsu/DC-MusicBot-RPC"
+        self.write(f"{self.text}<p><a href=\"#"
                    f"/releases\" target=\"_blank\">Baixe o app de rich presence aqui.</a></p>Link para adicionar no app "
                    f"de RPC abaixo: {ws_url}")
         # self.render("index.html") #será implementado futuramente...
