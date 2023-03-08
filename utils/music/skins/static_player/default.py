@@ -33,13 +33,13 @@ class DefaultStaticSkin:
 
         if not player.paused:
             embed.set_author(
-                name="Tocando Agora:",
+                name="Trenutno:",
                 icon_url="https://cdn.discordapp.com/attachments/480195401543188483/895862881105616947/music_equalizer.gif"
             )
 
         else:
             embed.set_author(
-                name="Em Pausa:",
+                name="Na pauzi:",
                 icon_url="https://cdn.discordapp.com/attachments/480195401543188483/896013933197013002/pause.png"
             )
 
@@ -58,41 +58,41 @@ class DefaultStaticSkin:
         except AttributeError:
             pass
 
-        duration = "> 🔴 **⠂Duração:** `Livestream`" if player.current.is_stream else \
-            (f"> ⏰ **⠂Duração:** `{time_format(player.current.duration)} [`" +
+        duration = "> 🔴 **⠂Trajanje:** `Livestream`" if player.current.is_stream else \
+            (f"> ⏰ **⠂Trajanje:** `{time_format(player.current.duration)} [`" +
             f"<t:{int((disnake.utils.utcnow() + datetime.timedelta(milliseconds=player.current.duration - player.position)).timestamp())}:R>`]`"
             if not player.paused else '')
 
         txt = f"[`{player.current.single_title}`]({player.current.uri})\n\n" \
               f"{duration}\n" \
-              f"> 💠 **⠂Por:** {player.current.authors_md}\n" \
-              f"> ✋ **⠂Pedido por:** <@{player.current.requester}>\n" \
-              f"> 🔊 **⠂Volume:** `{player.volume}%`"
+              f"> 💠 **⠂Od:** {player.current.authors_md}\n" \
+              f"> ✋ **⠂Zahtjev od:** <@{player.current.requester}>\n" \
+              f"> 🔊 **⠂Glasnoća:** `{player.volume}%`"
 
         if player.current.track_loops:
-            txt += f"\n> 🔂 **⠂Repetições restante:** `{player.current.track_loops}`"
+            txt += f"\n> 🔂 **⠂Preostalih ponavljanja:** `{player.current.track_loops}`"
 
         if player.loop:
             if player.loop == 'current':
-                e = '🔂'; m = 'Música atual'
+                e = '🔂'; m = 'Aktuelnu muziku'
             else:
                 e = '🔁'; m = 'Fila'
-            txt += f"\n> {e} **⠂Modo de repetição:** `{m}`"
+            txt += f"\n> {e} **⠂Režim ponavljanja:** `{m}`"
 
         if player.nightcore:
-            txt += f"\n> 🇳 **⠂Efeito nightcore:** `ativado`"
+            txt += f"\n> 🇳 **⠂Nightcore efekat:** `ativado`"
 
         if player.current.album_name:
-            txt += f"\n> 💽 **⠂Álbum:** [`{fix_characters(player.current.album_name, limit=20)}`]({player.current.album_url})"
+            txt += f"\n> 💽 **⠂Album:** [`{fix_characters(player.current.album_name, limit=20)}`]({player.current.album_url})"
 
         if player.current.playlist_name:
             txt += f"\n> 📑 **⠂Playlist:** [`{fix_characters(player.current.playlist_name, limit=20)}`]({player.current.playlist_url})"
 
         if player.keep_connected:
-            txt += "\n> ♾️ **⠂Modo 24/7:** `Ativado`"
+            txt += "\n> ♾️ **⠂Mod 24/7:** `Ativado`"
 
         elif player.restrict_mode:
-            txt += f"\n> 🔒 **⠂Modo restrito:** `Ativado`"
+            txt += f"\n> 🔒 **⠂Modo restrikcija:** `Ativado`"
 
         txt += f"{vc_txt}\n"
 
@@ -106,7 +106,7 @@ class DefaultStaticSkin:
                 for n, t in (enumerate(itertools.islice(player.queue, 20)))
             )
 
-            embed_queue = disnake.Embed(title=f"Músicas na fila: {qlenght}", color=player.bot.get_color(player.guild.me),
+            embed_queue = disnake.Embed(title=f"Pesme u redu: {qlenght}", color=player.bot.get_color(player.guild.me),
                                         description=f"\n{queue_txt}")
 
             if not player.loop and not player.keep_connected and not player.paused and not player.current.is_stream:
@@ -117,7 +117,7 @@ class DefaultStaticSkin:
                     if not t.is_stream:
                         queue_duration += t.duration
 
-                embed_queue.description += f"\n`[⌛ As músicas acabam` <t:{int((disnake.utils.utcnow() + datetime.timedelta(milliseconds=(queue_duration + (player.current.duration if not player.current.is_stream else 0)) - player.position)).timestamp())}:R> `⌛]`"
+                embed_queue.description += f"\n`[⌛ Pesme se završavaju` <t:{int((disnake.utils.utcnow() + datetime.timedelta(milliseconds=(queue_duration + (player.current.duration if not player.current.is_stream else 0)) - player.position)).timestamp())}:R> `⌛]`"
 
             embed_queue.set_image(url=queue_img)
 
@@ -134,54 +134,54 @@ class DefaultStaticSkin:
             disnake.ui.Button(emoji="⏭️", custom_id=PlayerControls.skip),
             disnake.ui.Button(emoji="📑", custom_id=PlayerControls.queue),
             disnake.ui.Select(
-                placeholder="Mais opções:",
+                placeholder="Više opcija:",
                 custom_id="musicplayer_dropdown_inter",
                 min_values=0, max_values=1,
                 options=[
                     disnake.SelectOption(
-                        label="Adicionar música", emoji="<:add_music:588172015760965654>",
+                        label= "Dodati muziku", emoji="<:add_music:588172015760965654>",
                         value=PlayerControls.add_song,
-                        description="Adicionar uma música/playlist na fila."
+                        description="Dodajte pjesmu/listu za reprodukciju u red čekanja."
                     ),
                     disnake.SelectOption(
-                        label="Adicionar favorito", emoji="⭐",
+                        label="Dodati favorit", emoji="⭐",
                         value=PlayerControls.enqueue_fav,
-                        description="Adicionar um de seus favoritos na fila."
+                        description="Dodajte jednog od svojih favorita u red čekanja."
                     ),
                     disnake.SelectOption(
-                        label="Tocar do inicio", emoji="⏪",
+                        label="Pusti od početka", emoji="⏪",
                         value=PlayerControls.seek_to_start,
-                        description="Voltar o tempo da música atual para o inicio."
+                        description="Vratite tempo trenutne pjesme na početak."
                     ),
                     disnake.SelectOption(
-                        label="Volume", emoji="🔊",
+                        label="Glasnoća", emoji="🔊",
                         value=PlayerControls.volume,
-                        description="Ajustar volume."
+                        description="Podesite jačinu zvuka."
                     ),
                     disnake.SelectOption(
-                        label="Misturar", emoji="🔀",
+                        label="Mix", emoji="🔀",
                         value=PlayerControls.shuffle,
-                        description="Misturar as músicas da fila."
+                        description="Miks pjesama u redu."
                     ),
                     disnake.SelectOption(
-                        label="Readicionar", emoji="🎶",
+                        label="Urednik", emoji="🎶",
                         value=PlayerControls.readd,
-                        description="Readicionar as músicas tocadas de volta na fila."
+                        description="Ponovo dodajte reprodukovane pesme u red čekanja."
                     ),
                     disnake.SelectOption(
-                        label="Repetição", emoji="🔁",
+                        label="Ponavljanje", emoji="🔁",
                         value=PlayerControls.loop_mode,
-                        description="Ativar/Desativar repetição da música/fila."
+                        description="Omogući/onemogući ponavljanje pjesme/reda."
                     ),
                     disnake.SelectOption(
                         label="Nightcore", emoji="🇳",
                         value=PlayerControls.nightcore,
-                        description="Ativar/Desativar o efeito nightcore."
+                        description="Omogući/onemogući noćni efekat."
                     ),
                     disnake.SelectOption(
-                        label="Ativar/Desativar modo restrito", emoji="🔐",
+                        label="Omogući/onemogući ograničeni način rada", emoji="🔐",
                         value=PlayerControls.restrict_mode,
-                        description="Apenas DJ's/Staff's podem usar comandos restritos."
+                        description="Samo DJ-i/osoblje mogu koristiti ograničene komande."
                     ),
                 ]
             ),
