@@ -237,7 +237,7 @@ class Misc(commands.Cog):
         if bot.default_prefix and not bot.config["INTERACTION_COMMAND_ONLY"]:
             embed.description += f"> **Prefixo:** `{disnake.utils.escape_markdown(prefix, as_needed=True)}`\n"
 
-        links = "[`[Source]`](https://github.com/zRitsu/disnake-LL-music-bot)"
+        links = "[`[Hvala na koristenju]`](#)"
 
         if bot.config["SUPPORT_SERVER"]:
             links += f" **|** [`[Suporte]`]({bot.config['SUPPORT_SERVER']})"
