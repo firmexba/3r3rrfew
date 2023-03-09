@@ -56,15 +56,15 @@ class SkinSelector(disnake.ui.View):
             global_static_select_opts.callback = self.global_static_skin_callback
             self.add_item(global_static_select_opts)
 
-            global_mode = disnake.ui.Button(label=("onemogućiti" if self.global_mode else "aktivirati") + " Globalni način rada ", emoji="🌐")
+            global_mode = disnake.ui.Button(label=("Desativar" if self.global_mode else "Ativar") + " modo Global ", emoji="🌐")
             global_mode.callback = self.mode_callback
             self.add_item(global_mode)
 
-        confirm_button = disnake.ui.Button(label="Da spasim", emoji="💾")
+        confirm_button = disnake.ui.Button(label="Salvar", emoji="💾")
         confirm_button.callback = self.confirm_callback
         self.add_item(confirm_button)
 
-        cancel_button = disnake.ui.Button(label="Otkaži", emoji="❌")
+        cancel_button = disnake.ui.Button(label="Cancelar", emoji="❌")
         cancel_button.callback = self.stop_callback
         self.add_item(cancel_button)
 
@@ -73,7 +73,7 @@ class SkinSelector(disnake.ui.View):
         if inter.author.id == self.ctx.author.id:
             return True
 
-        await inter.send(f"Samo {self.ctx.author.mention} mogu komunicirati ovdje!", ephemeral=True)
+        await inter.send(f"Apenas {self.ctx.author.mention} pode interagir aqui!", ephemeral=True)
         return False
 
     async def skin_callback(self, inter: disnake.MessageInteraction):
@@ -94,7 +94,7 @@ class SkinSelector(disnake.ui.View):
 
     async def mode_callback(self, inter: disnake.MessageInteraction):
         self.global_mode = not self.global_mode
-        self.children[4].label = ("onemogućiti" if self.global_mode else "aktivirati") + " globalni način rada"
+        self.children[4].label = ("Desativar" if self.global_mode else "Ativar") + " modo global"
         await inter.response.edit_message(view=self)
 
     async def confirm_callback(self, inter: disnake.MessageInteraction):
@@ -112,17 +112,17 @@ class MusicSettings(commands.Cog):
     def __init__(self, bot: BotCore):
         self.bot = bot
 
-    desc_prefix = "🔧 [Postavke] 🔧 | "
+    desc_prefix = "🔧 [Configurações] 🔧 | "
 
     # O nome desse comando está sujeito a alterações (tá ridiculo, mas não consegui pensar em um nome melhor no momento).
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.slash_command(
-        description=f"{desc_prefix}Dozvoli/Blokiraj mi povezivanje na kanal na kojem postoje drugi botovi.",
+        description=f"{desc_prefix}Permitir/bloquear de me conectar em um canal onde há outros bots.",
         default_member_permissions=disnake.Permissions(manage_guild=True)
     )
     async def dont_connect_other_bot_vc(
             self, inter: disnake.ApplicationCommandInteraction,
-            opt: str = commands.Param(choices=["omogućite", "onemogućiti"], description="Odaberite: omogućite ili onemogućite")
+            opt: str = commands.Param(choices=["Ativar", "Desativar"], description="Escolha: ativar ou desativar")
     ):
 
         inter, bot = await select_bot_pool(inter)
@@ -134,7 +134,7 @@ class MusicSettings(commands.Cog):
 
         guild_data = await bot.get_data(inter.guild_id, db_name=DBModel.guilds)
 
-        guild_data["check_other_bots_in_vc"] = opt == "aktivirati"
+        guild_data["check_other_bots_in_vc"] = opt == "Ativar"
 
         await bot.update_data(inter.guild_id, guild_data, db_name=DBModel.guilds)
 
@@ -142,8 +142,8 @@ class MusicSettings(commands.Cog):
 
         embed = disnake.Embed(
             color=self.bot.get_color(guild.me),
-            description="**Konfiguracija je uspješno sačuvana!\n"
-                        f"Sad {'br ' if opt == 'aktivirati' else ''}Pridružit ću se kanalima gdje postoje drugi botovi.**"
+            description="**Configuração salva com sucesso!\n"
+                        f"Agora {'não ' if opt == 'Ativar' else ''}irei me conectar em canais onde há outros bots.**"
         )
 
         try:
@@ -160,8 +160,8 @@ class MusicSettings(commands.Cog):
     @commands.has_guild_permissions(manage_guild=True)
     @commands.bot_has_guild_permissions(manage_channels=True, create_public_threads=True)
     @commands.command(
-        name="setup", aliases=["songrequestchannel", "sgrc"], usage="[ID kanala ili #kanal] [--reset]",
-        description="Kreirajte/odaberite namjenski kanal za traženje pjesama i ostavite plejer zakačenim.",
+        name="setup", aliases=["songrequestchannel", "sgrc"], usage="[id do canal ou #canal] [--reset]",
+        description="Criar/escolher um canal dedicado para pedir músicas e deixar player fixado.",
         cooldown=setup_cd, max_concurrency=setup_mc
     )
     async def setup_legacy(
@@ -179,24 +179,24 @@ class MusicSettings(commands.Cog):
             purge_messages = "no"
 
         if args:
-            raise GenericError("**Nevažeća opcija:** " + " ".join(args))
+            raise GenericError("**Opção inválida:** " + " ".join(args))
 
         await self.setup.callback(self=self, inter=ctx, target=channel,
                                   purge_messages=purge_messages)
 
     @commands.slash_command(
-        description=f"{desc_prefix}Kreirajte/odaberite namjenski kanal za traženje pjesama i ostavite plejer zakačenim.",
+        description=f"{desc_prefix}Criar/escolher um canal dedicado para pedir músicas e deixar player fixado.",
         default_member_permissions=disnake.Permissions(manage_guild=True), cooldown=setup_cd, max_concurrency=setup_mc
     )
     async def setup(
             self,
             inter: disnake.AppCmdInter,
             target: Union[disnake.TextChannel, disnake.VoiceChannel, disnake.ForumChannel, disnake.StageChannel] = commands.Param(
-                name="kanal", default=None, description="Odaberite postojeći kanal"
+                name="canal", default=None, description="Selecionar um canal existente"
             ),
             purge_messages: str = commands.Param(
                 name="limpar_mensagens", default="no",
-                description="Lčudne poruke sa odabranog kanala (do 100 poruka, nije na snazi ​​na forumu).",
+                description="Limpar mensagens do canal selecionado (até 100 mensagens, não efetivo em forum).",
                 choices=[
                     disnake.OptionChoice(
                         disnake.Localized("Yes", data={disnake.Locale.pt_BR: "Sim"}), "yes"
@@ -216,8 +216,8 @@ class MusicSettings(commands.Cog):
         guild = bot.get_guild(inter.guild_id)
 
         if not guild.me.guild_permissions.manage_channels or not guild.me.guild_permissions.create_public_threads:
-            raise GenericError(f"Nemam dozvolu za to **{perms_translations['manage_threads']}** e "
-                               f"**{perms_translations['create_public_threads']}** server.")
+            raise GenericError(f"Não tenho permissão de **{perms_translations['manage_threads']}** e "
+                               f"**{perms_translations['create_public_threads']}** no servidor.")
 
         channel = bot.get_channel(inter.channel.id)
 
@@ -271,7 +271,7 @@ class MusicSettings(commands.Cog):
                 pass
 
         embed_archived = disnake.Embed(
-            description=f"**Član je resetirao ovaj kanal sa zahtjevom za muziku {inter.author.mention}.**",
+            description=f"**Este canal de pedir música foi reconfigurado pelo membro {inter.author.mention}.**",
             color=bot.get_color(guild.me)
         )
 
@@ -281,7 +281,7 @@ class MusicSettings(commands.Cog):
 
                 try:
                     if isinstance(original_message.channel.parent, disnake.ForumChannel):
-                        await original_message.thread.delete(reason=f"Bot rekonfigurisan od strane {inter.author}.")
+                        await original_message.thread.delete(reason=f"Player reconfigurado por {inter.author}.")
                         return
                 except AttributeError:
                     pass
@@ -298,7 +298,7 @@ class MusicSettings(commands.Cog):
                     await original_message.thread.edit(
                         archived=True,
                         locked=True,
-                        reason=f"Bot rekonfigurisan od strane {inter.author}."
+                        reason=f"Player reconfigurado por {inter.author}."
                     )
                 except:
                     pass
@@ -328,10 +328,10 @@ class MusicSettings(commands.Cog):
 
             msg_select = await func(
                 embed=disnake.Embed(
-                    description="**Odaberite kanal ispod ili kliknite na jedno od dugmadi ispod da kreirate novi "
-                                "kanal za traženje pjesama.**",
+                    description="**Selecione um canal abaixo ou clique em um dos botões abaixo para criar um novo "
+                                "canal para pedir músicas.**",
                     color=self.bot.get_color(guild.me)
-                ).set_footer(text="Imate samo 30 sekundi da kliknete na dugme.."),
+                ).set_footer(text="Você tem apenas 30 segundos para clicar em um botão."),
                 components=[
                     disnake.ui.ChannelSelect(
                         custom_id=f"existing_channel_{id_}",
@@ -343,10 +343,10 @@ class MusicSettings(commands.Cog):
                             disnake.ChannelType.forum
                         ]
                     ),
-                    disnake.ui.Button(label="Kreirajte tekstualni kanal", custom_id=f"text_channel_{id_}", emoji="💬"),
-                    disnake.ui.Button(label="Kreirajte glasovni kanal", custom_id=f"voice_channel_{id_}", emoji="🔊"),
-                    disnake.ui.Button(label="Kreirajte scenski kanal", custom_id=f"stage_channel_{id_}", emoji="<:stagechannel:1077351815533826209>"),
-                    disnake.ui.Button(label="Otkaži", custom_id=f"voice_channel_cancel_{id_}", emoji="❌")
+                    disnake.ui.Button(label="Criar canal de texto", custom_id=f"text_channel_{id_}", emoji="💬"),
+                    disnake.ui.Button(label="Criar canal de voz", custom_id=f"voice_channel_{id_}", emoji="🔊"),
+                    disnake.ui.Button(label="Criar canal de palco", custom_id=f"stage_channel_{id_}", emoji="<:stagechannel:1077351815533826209>"),
+                    disnake.ui.Button(label="Cancelar", custom_id=f"voice_channel_cancel_{id_}", emoji="❌")
                 ],
                 **kwargs_msg
             )
@@ -383,13 +383,18 @@ class MusicSettings(commands.Cog):
                     except:
                         func = inter.message.edit
 
-                await func(
-                    embed=disnake.Embed(
-                        description="**Vrijeme je isteklo!**",
-                        color=disnake.Color.red()
-                    ),
-                    components=None
-                )
+                try:
+                    await func(
+                        embed=disnake.Embed(
+                            description="**Tempo esgotado!**",
+                            color=disnake.Color.red()
+                        ),
+                        components=None
+                    )
+                except disnake.NotFound:
+                    pass
+                except Exception:
+                    traceback.print_exc()
 
                 return
 
@@ -399,7 +404,7 @@ class MusicSettings(commands.Cog):
 
                 await inter.response.edit_message(
                     embed=disnake.Embed(
-                        description="**Operacija je otkazana...**",
+                        description="**Operação cancelada...**",
                         color=self.bot.get_color(guild.me),
                     ), components=None
                 )
@@ -418,7 +423,7 @@ class MusicSettings(commands.Cog):
                         await original_message.thread.edit(
                             archived=True,
                             locked=True,
-                            reason=f"Bot rekonfigurisan od strane {inter.author}.")
+                            reason=f"Player reconfigurado por {inter.author}.")
                 except:
                     pass
 
@@ -441,11 +446,11 @@ class MusicSettings(commands.Cog):
             channel_kwargs.clear()
 
             if not target.permissions_for(guild.me).create_forum_threads:
-                raise GenericError(f"**{bot.user.mention} nema dozvolu za objavljivanje na kanalu {target.mention}.**")
+                raise GenericError(f"**{bot.user.mention} não possui permissão para postar no canal {target.mention}.**")
 
             thread_wmessage = await target.create_thread(
                 name=f"{bot.user.name} song request",
-                content="Objava zahtjeva za pjesmu.",
+                content="Post para pedido de músicas.",
                 auto_archive_duration=10080,
                 slowmode_delay=5,
             )
@@ -460,12 +465,12 @@ class MusicSettings(commands.Cog):
         else:
 
             if not guild.me.guild_permissions.administrator and not target.permissions_for(guild.me).manage_permissions:
-                raise GenericError(f"**{guild.me.mention} nema administratorsku dozvolu ili "
-                                   f"upravljati dozvolama kanala {target.mention}** da uredite dozvole "
-                                   f"neophodno da bi sistem zahteva za muziku ispravno radio.\n\n"
-                                   f"U slučaju da ne želite dati administratorsku dozvolu ili urediti korisnička dopuštenja"
-                                   f" kanal {target.mention} da mi dozvolite da upravljam dozvolama, ponovo upotrebite komandu "
-                                   f"bez odabira odredišnog kanala.")
+                raise GenericError(f"**{guild.me.mention} não possui permissão de administrador ou permissão de "
+                                   f"gerenciar permissões do canal {target.mention}** para editar as permissões "
+                                   f"necessárias para o sistema de pedir música funcionar devidamente.\n\n"
+                                   f"Caso não queira fornecer a permissão de administrador ou editar as permissões do"
+                                   f" canal {target.mention} para me permitir gerenciar permissões, reuse o comando "
+                                   f"sem selecionar um canal de destino.")
 
             if purge_messages == "yes":
                 await target.purge(limit=100, check=lambda m: m.author != guild.me or not m.thread)
@@ -486,7 +491,7 @@ class MusicSettings(commands.Cog):
 
         channel = target
 
-        msg = f"Kanal zahtjeva za muziku je postavljen na <#{channel.id}> preko bota: {bot.user.mention}"
+        msg = f"O canal de pedido de músicas foi definido para <#{channel.id}> através do bot: {bot.user.mention}"
 
         if player and player.text_channel != target:
             if player.static:
@@ -494,7 +499,7 @@ class MusicSettings(commands.Cog):
                     await player.message.thread.edit(
                         archived=True,
                         locked=True,
-                        reason=f"Bot rekonfigurisan od strane {inter.author}."
+                        reason=f"Player reconfigurado por {inter.author}."
                     )
                 except:
                     pass
@@ -518,7 +523,7 @@ class MusicSettings(commands.Cog):
             if not message.thread:
                 await message.create_thread(name="song requests", auto_archive_duration=10080)
             elif message.thread.archived:
-                await message.thread.edit(archived=False, reason=f"Zahtjev za pjesmu ponovo aktivirao: {inter.author}.")
+                await message.thread.edit(archived=False, reason=f"Song request reativado por: {inter.author}.")
         elif player and player.guild.me.voice.channel != channel:
             await player.connect(channel.id)
 
@@ -529,8 +534,8 @@ class MusicSettings(commands.Cog):
         reset_txt = f"{inter.prefix}reset" if isinstance(inter, CustomContext) else "/reset"
 
         embed = disnake.Embed(
-            description=f"**{msg}**\n\nNapomena: Ako želite da vratite ovu konfiguraciju, samo koristite naredbu {reset_txt} ou "
-                        f"izbrisati kanal/post {channel.mention}",
+            description=f"**{msg}**\n\nObs: Caso queira reverter esta configuração, apenas use o comando {reset_txt} ou "
+                        f"delete o canal/post {channel.mention}",
             color=bot.get_color(guild.me)
         )
         try:
@@ -545,7 +550,7 @@ class MusicSettings(commands.Cog):
     @commands.bot_has_guild_permissions(manage_threads=True)
     @commands.command(
         name="reset", usage="[--delete]",
-        description="Poništi postavke vezane za kanal zahtjeva za pjesmu.",
+        description="Resetar as configurações relacionadas ao canal de pedir música (song request).",
         cooldown=setup_cd, max_concurrency=setup_mc
     )
     async def reset_legacy(self, ctx: CustomContext, *, delete_channel: str = None):
@@ -556,7 +561,7 @@ class MusicSettings(commands.Cog):
         await self.reset.callback(self=self, inter=ctx, delete_channel=delete_channel)
 
     @commands.slash_command(
-        description=f"{desc_prefix}Poništi postavke vezane za kanal zahtjeva za pjesmu.",
+        description=f"{desc_prefix}Resetar as configurações relacionadas ao canal de pedir música (song request).",
         default_member_permissions=disnake.Permissions(manage_guild=True), cooldown=setup_cd, max_concurrency=setup_mc
     )
     async def reset(
@@ -564,7 +569,7 @@ class MusicSettings(commands.Cog):
             inter: disnake.AppCmdInter,
             delete_channel: str = commands.Param(
                 name="deletar_canal",
-                description="obrišite kanal iz kontrolera plejera", default=None, choices=["Da", "Ne"]
+                description="deletar o canal do player controller", default=None, choices=["sim", "não"]
             )
     ):
 
@@ -578,7 +583,7 @@ class MusicSettings(commands.Cog):
         guild = bot.get_guild(inter.guild_id) or inter.guild
 
         if not guild.me.guild_permissions.manage_threads:
-            raise GenericError(f"Nemam dozvolu za to **{perms_translations['manage_threads']}** na serveru.")
+            raise GenericError(f"Não tenho permissão de **{perms_translations['manage_threads']}** no servidor.")
 
         channel_inter = bot.get_channel(inter.channel.id)
 
@@ -591,13 +596,13 @@ class MusicSettings(commands.Cog):
             channel = None
 
         if not channel or channel.guild.id != inter.guild_id:
-            raise GenericError(f"**Nema konfiguriranih kanala za zahtjeve za muziku (ili je kanal obrisan).**")
+            raise GenericError(f"**Não há canais de pedido de música configurado (ou o canal foi deletado).**")
 
         try:
             if isinstance(channel.parent, disnake.ForumChannel):
-                await channel.delete(reason=f"{inter.author.id} resetiranje plejera")
+                await channel.delete(reason=f"{inter.author.id} resetou player")
                 if channel_inter != channel:
-                    await inter.edit_original_message("Objava je uspješno izbrisana!", embed=None, components=None)
+                    await inter.edit_original_message("O post foi deletado com sucesso!", embed=None, components=None)
 
                 try:
                     player: LavalinkPlayer = bot.music.players[guild.id]
@@ -638,7 +643,7 @@ class MusicSettings(commands.Cog):
         await func(
             embed=disnake.Embed(
                 color=self.bot.get_color(guild.me),
-                description="**Kanal za traženje muzike je uspješno resetovan.**"
+                description="**O Canal de pedir música foi resetado com sucesso.**"
             ), components=[]
         )
 
@@ -655,21 +660,21 @@ class MusicSettings(commands.Cog):
 
         try:
             if delete_channel == "sim":
-                await channel.delete(reason=f"Plejer jw resetirao: {inter.author}")
+                await channel.delete(reason=f"Player resetado por: {inter.author}")
 
             elif original_message:
                 await original_message.edit(
-                    content=f"Zatražite muzički kanal je resetirao član {inter.author.mention}.",
+                    content=f"Canal de pedir música foi resetado pelo membro {inter.author.mention}.",
                     embed=None, components=[
-                        disnake.ui.Button(label="Ponovo konfigurišite ovaj kanal", emoji="💠",
+                        disnake.ui.Button(label="Reconfigurar este canal", emoji="💠",
                                           custom_id="musicplayer_request_channel")
                     ]
                 )
-                await original_message.thread.edit(archived=True, reason=f"Plejer je resetirao {inter.author}.")
+                await original_message.thread.edit(archived=True, reason=f"Player resetado por {inter.author}.")
         except Exception as e:
             traceback.print_exc()
             raise GenericError(
-                "**Zahtjev za muzički kanal je resetovan iz baze podataka, ali je došlo do greške u procesu:** "
+                "**O canal de pedir música foi resetado da base de dados mas ocorreu um erro no processo:** "
                 f"```py\n{repr(e)}```"
             )
 
@@ -677,13 +682,13 @@ class MusicSettings(commands.Cog):
     djrole_mc =commands.MaxConcurrency(1, per=commands.BucketType.guild, wait=False)
 
     @commands.has_guild_permissions(manage_guild=True)
-    @commands.command(name="adddjrole",description="Dodajte ulogu na DJ listu servera.",
+    @commands.command(name="adddjrole",description="Adicionar um cargo para a lista de DJ's do servidor.",
                       usage="[id / nome / @cargo]", cooldown=djrole_cd, max_concurrency=djrole_mc)
     async def add_dj_role_legacy(self, ctx: CustomContext, *, role: Optional[disnake.Role] = None):
 
         if not role:
-            raise GenericError("**Niste naveli ulogu.\n"
-                               "Koristite naredbu na jedan od dolje navedenih metoda:**\n\n"
+            raise GenericError("**Você não especificou um cargo.\n"
+                               "Use o comando por um dos métodos abaixo:**\n\n"
                                f"{ctx.prefix}{ctx.invoked_with} id_do_cargo\n"
                                f"{ctx.prefix}{ctx.invoked_with} @cargo\n"
                                f"{ctx.prefix}{ctx.invoked_with} nome_do_cargo")
@@ -691,7 +696,7 @@ class MusicSettings(commands.Cog):
         await self.add_dj_role.callback(self=self,inter=ctx, role=role)
 
     @commands.slash_command(
-        description=f"{desc_prefix}Dodajte ulogu na DJ listu servera.",
+        description=f"{desc_prefix}Adicionar um cargo para a lista de DJ's do servidor.",
         default_member_permissions=disnake.Permissions(manage_guild=True), cooldown=djrole_cd, max_concurrency=djrole_mc
     )
     async def add_dj_role(
@@ -705,35 +710,35 @@ class MusicSettings(commands.Cog):
         role = guild.get_role(role.id)
 
         if role == guild.default_role:
-            await inter.send("Ne možete dodati ovo.", ephemeral=True)
+            await inter.send("Você não pode adicionar esse cargo.", ephemeral=True)
             return
 
         guild_data = await bot.get_data(guild.id, db_name=DBModel.guilds)
 
         if str(role.id) in guild_data['djroles']:
-            await inter.send(f"Pozicija {role.mention} već na DJ listi", ephemeral=True)
+            await inter.send(f"O cargo {role.mention} já está na lista de DJ's", ephemeral=True)
             return
 
         guild_data['djroles'].append(str(role.id))
 
         await bot.update_data(guild.id, guild_data, db_name=DBModel.guilds)
 
-        await inter.send(f"Pozicija {role.mention} je dodat na listu DJ-eva.", ephemeral=True)
+        await inter.send(f"O cargo {role.mention} foi adicionado à lista de DJ's.", ephemeral=True)
 
     @commands.has_guild_permissions(manage_guild=True)
-    @commands.command(description="Uklanjanje uloge sa DJ liste servera.", usage="[id / nome / @cargo]",
+    @commands.command(description="Remover um cargo para a lista de DJ's do servidor.", usage="[id / nome / @cargo]",
                       cooldown=djrole_cd, max_concurrency=djrole_mc)
     async def remove_dj_role_legacy(self, ctx: CustomContext, *, role: disnake.Role):
         await self.remove_dj_role.callback(self=self, inter=ctx, role=role)
 
     @commands.slash_command(
-        description=f"{desc_prefix}Uklanjanje uloge sa DJ liste servera.",
+        description=f"{desc_prefix}Remover um cargo para a lista de DJ's do servidor.",
         default_member_permissions=disnake.Permissions(manage_guild=True), cooldown=djrole_cd, max_concurrency=djrole_mc
     )
     async def remove_dj_role(
             self,
             inter: disnake.ApplicationCommandInteraction,
-            role: disnake.Role = commands.Param(name="pozicija", description="Pozicija")
+            role: disnake.Role = commands.Param(name="cargo", description="Cargo")
     ):
 
         inter, bot = await select_bot_pool(inter)
@@ -745,14 +750,14 @@ class MusicSettings(commands.Cog):
 
         if not guild_data['djroles']:
 
-            await inter.send("Nema pozicija na DJ listi.", ephemeral=True)
+            await inter.send("Não há cargos na lista de DJ's.", ephemeral=True)
             return
 
         guild = bot.get_guild(inter.guild_id) or inter.guild
         role = guild.get_role(role.id)
 
         if str(role.id) not in guild_data['djroles']:
-            await inter.send(f"Pozicija {role.mention} nije na listi DJ-eva\n\n" + "Pozicija:\n" +
+            await inter.send(f"O cargo {role.mention} não está na lista de DJ's\n\n" + "Cargos:\n" +
                                               " ".join(f"<#{r}>" for r in guild_data['djroles']), ephemeral=True)
             return
 
@@ -766,14 +771,14 @@ class MusicSettings(commands.Cog):
     skin_mc =commands.MaxConcurrency(1, per=commands.BucketType.member, wait=False)
 
     @commands.has_guild_permissions(manage_guild=True)
-    @commands.command(description="Promijenite izgled/skin bota.", name="changeskin", aliases=["setskin", "skin"],
+    @commands.command(description="Alterar aparência/skin do player.", name="changeskin", aliases=["setskin", "skin"],
                       cooldown=skin_cd, max_concurrency=skin_mc)
     async def change_skin_legacy(self, ctx: CustomContext):
 
         await self.change_skin.callback(self=self, inter=ctx)
 
     @commands.slash_command(
-        description=f"{desc_prefix}Promijenite izgled/skin bota.", cooldown=skin_cd, max_concurrency=skin_mc,
+        description=f"{desc_prefix}Alterar aparência/skin do player.", cooldown=skin_cd, max_concurrency=skin_mc,
         default_member_permissions=disnake.Permissions(manage_guild=True)
     )
     async def change_skin(self, inter: disnake.AppCmdInter):
@@ -795,16 +800,16 @@ class MusicSettings(commands.Cog):
         selected = guild_data["player_controller"]["skin"] or bot.default_skin
         static_selected = guild_data["player_controller"]["static_skin"] or bot.default_static_skin
 
-        skins_opts = [disnake.SelectOption(emoji="🎨", label=f"Normal: {s}", value=s, **{"default": True, "description": "Trenutni"} if selected == s else {}) for s in skin_list]
-        static_skins_opts = [disnake.SelectOption(emoji="🎨", label=f"Pjesma-Zahtjev: {s}", value=s, **{"default": True, "description": "Trenutni"} if static_selected == s else {}) for s in static_skin_list]
+        skins_opts = [disnake.SelectOption(emoji="🎨", label=f"Modo normal: {s}", value=s, **{"default": True, "description": "skin atual"} if selected == s else {}) for s in skin_list]
+        static_skins_opts = [disnake.SelectOption(emoji="🎨", label=f"Song-Request: {s}", value=s, **{"default": True, "description": "skin atual"} if static_selected == s else {}) for s in static_skin_list]
 
         if self.bot.config["GLOBAL_PREFIX"]:
             global_data = await bot.get_global_data(guild.id, db_name=DBModel.guilds)
             global_selected = global_data["player_skin"] or bot.default_skin
             global_static_selected = global_data["player_skin_static"] or bot.default_static_skin
             global_mode = global_data["global_skin"]
-            global_skins_opts = [disnake.SelectOption(emoji="🎨", label=f"Global Normal: {s}", value=s, **{"default": True, "description": "Trenutni"} if global_selected == s else {}) for s in skin_list]
-            global_static_skins_opts = [disnake.SelectOption(emoji="🎨", label=f"Global Pjesma-Zahtjev: {s}", value=s, **{"default": True, "description": "Trenutni"} if global_static_selected == s else {}) for s in static_skin_list]
+            global_skins_opts = [disnake.SelectOption(emoji="🎨", label=f"Global Modo Normal: {s}", value=s, **{"default": True, "description": "skin atual"} if global_selected == s else {}) for s in skin_list]
+            global_static_skins_opts = [disnake.SelectOption(emoji="🎨", label=f"Global Song-Request: {s}", value=s, **{"default": True, "description": "skin atual"} if global_static_selected == s else {}) for s in static_skin_list]
 
         else:
             global_data = {}
@@ -829,10 +834,10 @@ class MusicSettings(commands.Cog):
                 func = inter.send
 
         embed = disnake.Embed(
-            description="**Odaberite dostupne skinove ispod:**\n\n"
-                        "**Normal:**\n\n" + "\n".join(f"`{s}` [`(visualizar)`]({bot.player_skins[s].preview})" for s in skin_list) + "\n\n" 
-                        "**Pjesma-Zahtjev**\n\n" + "\n".join(f"`{s}` [`(visualizar)`]({bot.player_static_skins[s].preview})" for s in static_skin_list) +
-                        "\n\n`Napomena: U globalnom režimu svi serverski botovi koriste istu kožu.`",
+            description="**Selecione as skins disponíveis abaixo:**\n\n"
+                        "**Modo Normal:**\n\n" + "\n".join(f"`{s}` [`(visualizar)`]({bot.player_skins[s].preview})" for s in skin_list) + "\n\n" 
+                        "**Modo fixo (song-request):**\n\n" + "\n".join(f"`{s}` [`(visualizar)`]({bot.player_static_skins[s].preview})" for s in static_skin_list) +
+                        "\n\n`Nota: No modo global todos os bots do servidor usam a mesma skin.`",
             colour=bot.get_color(guild.me)
         )
 
@@ -849,7 +854,7 @@ class MusicSettings(commands.Cog):
         if select_view.skin_selected is None:
             await select_view.interaction.response.edit_message(
                 view=None,
-                embed=disnake.Embed(description="**Zahtjev je otkazan.**", colour=bot.get_color(guild.me))
+                embed=disnake.Embed(description="**Solicitação cancelada.**", colour=bot.get_color(guild.me))
             )
             return
 
@@ -858,7 +863,7 @@ class MusicSettings(commands.Cog):
                 msg = await inter.original_message()
             except AttributeError:
                 pass
-            await msg.edit(view=None, embed=disnake.Embed(description="**Vrijeme je isteklo!**", colour=bot.get_color(guild.me)))
+            await msg.edit(view=None, embed=disnake.Embed(description="**Tempo esgotado!**", colour=bot.get_color(guild.me)))
             return
 
         inter = select_view.interaction
@@ -881,26 +886,26 @@ class MusicSettings(commands.Cog):
         changed_skins_txt = ""
 
         if selected != select_view.skin_selected:
-            changed_skins_txt += f"Normal: [`{select_view.skin_selected}`]({self.bot.player_skins[select_view.skin_selected].preview})\n"
+            changed_skins_txt += f"Modo Normal: [`{select_view.skin_selected}`]({self.bot.player_skins[select_view.skin_selected].preview})\n"
 
         if static_selected != select_view.static_skin_selected:
-            changed_skins_txt += f"Pjesma-Zahtjev: [`{select_view.static_skin_selected}`]({self.bot.player_static_skins[select_view.static_skin_selected].preview})\n"
+            changed_skins_txt += f"Song Request: [`{select_view.static_skin_selected}`]({self.bot.player_static_skins[select_view.static_skin_selected].preview})\n"
 
         if global_selected != select_view.global_skin_selected:
-            changed_skins_txt += f"Global - Normal: [`{select_view.global_skin_selected}`]({self.bot.player_skins[select_view.global_skin_selected].preview})\n"
+            changed_skins_txt += f"Global - Modo Normal: [`{select_view.global_skin_selected}`]({self.bot.player_skins[select_view.global_skin_selected].preview})\n"
 
         if global_static_selected != select_view.global_static_skin_selected:
-            changed_skins_txt += f"Global - Pjesma-Zahtjev: [`{select_view.global_static_skin_selected}`]({self.bot.player_static_skins[select_view.global_static_skin_selected].preview})\n"
+            changed_skins_txt += f"Global - Song Request: [`{select_view.global_static_skin_selected}`]({self.bot.player_static_skins[select_view.global_static_skin_selected].preview})\n"
 
         if global_mode != select_view.global_mode:
-            changed_skins_txt += "Izgled Global: `" + ("Aktivirano" if select_view.global_mode else "Onemogućeno") + "`\n"
+            changed_skins_txt += "Skin Global: `" + ("Ativado" if select_view.global_mode else "Desativado") + "`\n"
 
         global_mode = select_view.global_mode
 
         if not changed_skins_txt:
-            txt = "**Nije bilo promjena u postavkama izgleda...**"
+            txt = "**Não houve alterações nas configurações de skin...**"
         else:
-            txt = f"**Izgled bota servera je uspješno promijenjena.**\n{changed_skins_txt}"
+            txt = f"**A skin do player do servidor foi alterado com sucesso.**\n{changed_skins_txt}"
 
         kwargs = {
             "embed": disnake.Embed(
@@ -947,7 +952,7 @@ class MusicSettings(commands.Cog):
 
             player.setup_hints()
             player.process_hint()
-            player.set_command_log(text=f"{inter.author.mention} Izgled.", emoji="🎨")
+            player.set_command_log(text=f"{inter.author.mention} alterou a skin do player.", emoji="🎨")
             await player.invoke_np(force=True)
             await asyncio.sleep(1.5)
 
@@ -956,14 +961,14 @@ class MusicSettings(commands.Cog):
     @commands.command(
         name="nodeinfo",
         aliases=["llservers", "ll"],
-        description="Pogledajte informacije o muzičkom serveru."
+        description="Ver informações dos servidores de música."
     )
     async def nodeinfo_legacy(self, ctx: CustomContext):
         await self.nodeinfo.callback(self=self, inter=ctx)
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.slash_command(
-        description=f"{desc_prefix}Pogledajte informacije o muzičkom serveru (lavalink serveri)."
+        description=f"{desc_prefix}Ver informações dos servidores de música (lavalink servers)."
     )
     async def nodeinfo(self, inter: disnake.AppCmdInter):
 
@@ -974,10 +979,10 @@ class MusicSettings(commands.Cog):
 
         guild = bot.get_guild(inter.guild_id) or inter.guild
 
-        em = disnake.Embed(color=bot.get_color(guild.me), title="Muzički serveri:")
+        em = disnake.Embed(color=bot.get_color(guild.me), title="Servidores de música:")
 
         if not bot.music.nodes:
-            em.description = "**Nema servera.**"
+            em.description = "**Não há servidores.**"
             await inter.send(embed=em)
             return
 
@@ -1008,7 +1013,7 @@ class MusicSettings(commands.Cog):
             txt += f'RAM: `{used}/{free}`\n' \
                    f'RAM Total: `{total}`\n' \
                    f'CPU Cores: `{cpu_cores}`\n' \
-                   f'CPU Usages: `{cpu_usage}%`\n' \
+                   f'Uso de CPU: `{cpu_usage}%`\n' \
                    f'Uptime: <t:{int((disnake.utils.utcnow() - datetime.timedelta(milliseconds=node.stats.uptime)).timestamp())}:R>\n'
 
             if started:
@@ -1023,7 +1028,7 @@ class MusicSettings(commands.Cog):
                 txt += "\n"
 
             if node.website:
-                txt += f'[`Web stranica server`]({node.website})\n'
+                txt += f'[`Website do server`]({node.website})\n'
 
             status = "🌟" if current_player else "✅"
 
@@ -1035,7 +1040,7 @@ class MusicSettings(commands.Cog):
         if failed_nodes:
             embeds.append(
                 disnake.Embed(
-                    title="**Serveri koji nisu uspjeli** `❌`",
+                    title="**Servidores que falharam** `❌`",
                     description=f"```ansi\n[31;1m" + "\n".join(failed_nodes) + "[0m\n```",
                     color=bot.get_color(guild.me)
                 )
