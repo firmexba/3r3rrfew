@@ -68,15 +68,15 @@ class BotPool:
                         return
 
                     self.killing_state = "ratelimit"
-                    print("Aplicação com ratelimit do discord!")
+                    print("Aplikacija s ograničenjem brzine neslaganja!")
                     return
 
                 if self.killing_state is True:
                     return
 
                 print(
-                    "Aplicação com ratelimit do discord!\n"
-                    "Finalizando/Reiniciando o processo em 5 segundos..."
+                    "Aplikacija s ograničenjem brzine neslaganja!\n"
+                    "Završetak/ponovno pokretanje procesa za 5 sekundi..."
                 )
 
                 self.killing_state = True
@@ -157,7 +157,7 @@ class BotPool:
 
         if self.config["AUTO_DOWNLOAD_LAVALINK_SERVERLIST"]:
             ini_file = "auto_lavalink.ini"
-            print("Baixando lista de servidores lavalink (arquivo: lavalink.ini)")
+            print("Preuzimanje liste servera lavalink (fajl: lavalink.ini)")
             r = requests.get(self.config["LAVALINK_SERVER_LIST"], allow_redirects=True)
             with open("auto_lavalink.ini", 'wb') as f:
                 f.write(r.content)
@@ -201,7 +201,7 @@ class BotPool:
         if mongo_key:
             self.mongo_database = MongoDatabase(mongo_key)
         else:
-            print(f"O token/link do mongoDB não foi configurado...\nSerá usado um arquivo json para database.\n{'-' * 30}")
+            print(f"mongoDB token/link nije konfigurisan...\nZa bazu podataka će se koristiti json fajl.\n{'-' * 30}")
 
         self.local_database = LocalDatabase()
 
@@ -240,7 +240,7 @@ class BotPool:
                     default_prefix = None
 
             if not token:
-                print(f"{bot_name} Ignorado (token não informado)...")
+                print(f"{bot_name} Ignorirano (token nije dat)...")
                 return
 
             try:
@@ -274,8 +274,8 @@ class BotPool:
                 async def check_commands(ctx: CustomContext):
 
                     if not (await bot.is_owner(ctx.author)):
-                        raise GenericError("**Os comandos de texto estão desativados!\n"
-                                           "Use os comandos de barra /**", self_delete=True, delete_original=15)
+                        raise GenericError("**Tekstualne komande su onemogućene!\n"
+                                           "Koristite komandnu traku /**", self_delete=True, delete_original=15)
 
                     return True
 
@@ -345,7 +345,7 @@ class BotPool:
 
                             @bot.slash_command(
                                 name=disnake.Localized("register_commands",data={disnake.Locale.pt_BR: "registrar_comandos"}),
-                                description="Use este comando caso meus outros comandos de barra (/) não estejam disponíveis..."
+                                description="Koristite ovu komandu u slučaju da moje druge komande (/) nisu dostupne..."
                             )
                             async def register_commands(
                                     inter: disnake.AppCmdInter,
@@ -363,17 +363,17 @@ class BotPool:
                                     interaction_invites += f"[`{disnake.utils.escape_markdown(str(b.user.name))}`]({disnake.utils.oauth_url(b.user.id, scopes=['applications.commands'])}) "
 
                                 embed = disnake.Embed(
-                                    description="**Atenção!** Todos os meus comandos de barra (/) funcionam através da aplicação "
-                                                f"com um dos nomes abaixo:**\n{interaction_invites}\n\n"
-                                                "**Caso os comandos da aplicação acima não sejam exibidos ao digitar barra (/), "
-                                                "clique no nome acima para integrar os comandos de barra no seu "
-                                                "servidor.",
+                                    description="**Pažnja!** Sve moje komande (/) rade kroz aplikaciju "
+                                                f"sa jednim od imena ispod:**\n{interaction_invites}\n\n"
+                                                "**U slučaju da se gornje naredbe aplikacije ne prikazuju kada kucate kosu crtu naprijed(/), "
+                                                "kliknite na ime iznad da integrišete komande kosih crta u svoje "
+                                                "servere.",
                                     color=bot.get_color()
                                 )
 
                                 if not inter.author.guild_permissions.manage_guild:
-                                    embed.description += "\n\n**Nota:** Será necessário ter a permissão de **Gerenciar " \
-                                                         "Servidor** para integrar os comandos no servidor atual."
+                                    embed.description += "\n\n**Paznja:** Za to će vam trebati dozvola **Administrator " \
+                                                         "Server** da integrišete komande u trenutni server."
 
                                 await inter.send(embed=embed, ephemeral=True)
 
@@ -419,9 +419,9 @@ class BotPool:
         if not self.bots:
             os.system('cls' if os.name == 'nt' else 'clear')
             raise Exception(
-                "O token do bot não foi configurado devidamente!\n"
-                "Confira se o token foi configurado na ENV/ENVIRONMENT/SECRETS ou no arquivo .env\n"
-                "Caso ainda tenha dúvidas, entre no servidor de suporte: https://discord.gg/R7BPG8fZTr"
+                "Token bota nije pravilno konfigurisan!\n"
+                "Provjerite je li token konfiguriran u ENV/ENVIRONMENT/SECRETS ili u .env datoteci\n"
+                "Ako i dalje imate pitanja, pridružite se serveru za podršku: https://discord.gg/"
             )
 
         if start_local:
@@ -502,7 +502,7 @@ class BotCore(commands.Bot):
             try:
                 skin_file = import_module(f"utils.music.skins.normal_player.{skin[:-3]}")
                 if not hasattr(skin_file, "load"):
-                    print(f"Skin ignorada: {skin} | Função load() não configurada/encontrada...")
+                    print(f"Skin ignorada: {skin} | Funkcija nije postavljena/pronađena...")
                     continue
                 self.player_skins[skin[:-3]] = skin_file.load()
             except Exception:
@@ -607,7 +607,7 @@ class BotCore(commands.Bot):
 
         if not message.channel.permissions_for(message.guild.me).send_messages:
 
-            print(f"Can't send message in: {message.channel.name} [{message.channel.id}] (Missing permissions)")
+            print(f"Nije moguće poslati poruku u: {message.channel.name} [{message.channel.id}] (Nedostaju dozvole)")
 
             bucket = self.dm_cooldown.get_bucket(message)
             retry_after = bucket.update_rate_limit()
@@ -616,7 +616,7 @@ class BotCore(commands.Bot):
                 return
 
             try:
-                await message.author.send(f"Não tenho permissão para enviar mensagens no canal {message.channel.mention}...")
+                await message.author.send(f"Nemam dozvolu za slanje poruka na kanalu {message.channel.mention}...")
             except disnake.HTTPException:
                 pass
 
@@ -655,8 +655,8 @@ class BotCore(commands.Bot):
                 if not isinstance(prefix, str):
                     prefix = prefix[-1]
 
-                embed.description = f"**Olá {message.author.mention}.\n\n" \
-                                    f"Para ver todos os meus comandos use: /**"
+                embed.description = f"**Zdravo {message.author.mention}.\n\n" \
+                                    f"Da vidite sve moje komande koristite: /**"
 
                 bot_count = 0
 
@@ -678,16 +678,16 @@ class BotCore(commands.Bot):
                         interaction_invites.append(f"[`{disnake.utils.escape_markdown(str(b.user.name))}`]({disnake.utils.oauth_url(b.user.id, scopes=['applications.commands'])}) ")
 
                     if interaction_invites:
-                        embed.description += f"\n\nMeus comandos de barra (/) funcionam através " \
-                                             f"das seguintes aplicações abaixo:\n" \
+                        embed.description += f"\n\nMoje komande naprijed (/) rades " \
+                                             f"od sljedećih aplikacija u nastavku:\n" \
                                              f"{' **|** '.join(interaction_invites)}\n\n" \
-                                             f"Caso os comandos da aplicação acima não sejam exibidos ao digitar " \
-                                             f"barra (/), clique no nome acima para integrar os comandos de barra no " \
-                                             f"seu servidor."
+                                             f"Ako se gornje naredbe aplikacije ne prikazuju prilikom kucanja " \
+                                             f"kosa crta (/), kliknite na ime iznad da biste ugradili komande kose crte u " \
+                                             f"vaš server."
 
                 if not self.config["INTERACTION_COMMAND_ONLY"]:
-                    embed.description += f"\n\nTambém tenho comandos de texto por prefixo.\n" \
-                                        f"Para ver todos os meus comandos de texto use **{prefix}help**\n"
+                    embed.description += f"\n\nImam i tekstualne komande po prefiksu.\n" \
+                                        f"Da vidite sve moje tekstualne komande koristite **{prefix}help**\n"
 
                 if bot_count:
 
@@ -695,15 +695,15 @@ class BotCore(commands.Bot):
                         "components": [
                             disnake.ui.Button(
                                 custom_id="bot_invite",
-                                label="Precisa de mais bots de música? Clique aqui."
+                                label="Trebate još muzičkih botova? Kliknite ovdje."
                             )
                         ]
                     }
 
             else:
 
-                embed.title = "PAINEL DE CONTROLE."
-                embed.set_footer(text="Clique em uma tarefa que deseja executar.")
+                embed.title = "KONTROLNA TABLA."
+                embed.set_footer(text="Kliknite na zadatak koji želite izvršiti.")
                 kwargs = {"view": PanelView(self)}
 
             await message.reply(embed=embed, **kwargs)
@@ -750,8 +750,8 @@ class BotCore(commands.Bot):
                     if raise_error is False:
                         return False
 
-                    raise GenericError("**Você não pode usar comandos prefixed na postagem atual...**\n"
-                                       "`Use comando de barra (/) aqui.`", self_delete=True)
+                    raise GenericError("**Ne možete koristiti naredbe s prefiksom u trenutnoj objavi...**\n"
+                                       "`Ovdje koristite naredbu kose crte (/)..`", self_delete=True)
         except AttributeError:
             pass
 
@@ -789,12 +789,12 @@ class BotCore(commands.Bot):
     async def on_application_command(self, inter: disnake.ApplicationCommandInteraction):
 
         if not inter.guild_id:
-            await inter.send("Meus comandos não podem ser usados no DM.\n"
-                             "Use em algum servidor que estou presente.")
+            await inter.send("Moje komande se ne mogu koristiti u DM-u.\n"
+                             "Koristiti na bilo kom serveru koji sam prisutan.")
             return
 
         if not self.bot_ready:
-            await inter.send("Ainda estou inicializando...\nPor favor aguarde mais um pouco...", ephemeral=True)
+            await inter.send("Još uvijek dižem...\nPričekajte još malo...", ephemeral=True)
             return
 
         if self.config["COMMAND_LOG"] and inter.guild:
@@ -832,10 +832,10 @@ class BotCore(commands.Bot):
                         print(f"{'=' * 48}\n[OK] {bot_name} - {filename}.py Carregado.")
                         load_status["loaded"].append(f"{filename}.py")
                     except Exception as e:
-                        print(f"{'=' * 48}\n[ERRO] {bot_name} - Falha ao carregar/recarregar o módulo: {filename}")
+                        print(f"{'=' * 48}\n[ERRO] {bot_name} - Učitavanje/ponovno učitavanje modula nije uspjelo: {filename}")
                         raise e
                 except Exception as e:
-                    print(f"{'=' * 48}\n[ERRO] {bot_name} - Falha ao carregar/recarregar o módulo: {filename}")
+                    print(f"{'=' * 48}\n[ERRO] {bot_name} - Učitavanje/ponovno učitavanje modula nije uspjelo: {filename}")
                     raise e
 
         print(f"{'=' * 48}")
@@ -845,7 +845,7 @@ class BotCore(commands.Bot):
 
         for c in self.slash_commands:
             if (desc:=len(c.description)) > 100:
-                raise Exception(f"A descrição do comando {c.name} excedeu a quantidade de caracteres permitido "
-                                f"no discord (100), quantidade atual: {desc}")
+                raise Exception(f"Opis naredbe {c.name} Prekoračeno dozvoljenih znakova "
+                                f"nema neslaganja (100), trenutna količina: {desc}")
 
         return load_status
