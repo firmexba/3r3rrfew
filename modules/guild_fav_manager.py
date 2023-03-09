@@ -22,19 +22,19 @@ class GuildFavModal(disnake.ui.Modal):
         self.name = name
 
         super().__init__(
-            title="Dodaj/uredi plejlistu/favorite",
+            title="Adicionar/Editar playlist/favorito",
             custom_id="guild_fav_edit",
             timeout=180,
             components=[
                 disnake.ui.TextInput(
-                    label="Naziv favorita/plejliste:",
+                    label="Nome do favorito/playlist:",
                     custom_id="guild_fav_name",
                     min_length=2,
                     max_length=25,
                     value=name or None
                 ),
                 disnake.ui.TextInput(
-                    label="Opis:",
+                    label="Descrição:",
                     custom_id="guild_fav_description",
                     max_length=50,
                     value=description or None
@@ -58,7 +58,7 @@ class GuildFavModal(disnake.ui.Modal):
         except IndexError:
             await inter.send(
                 embed=disnake.Embed(
-                    description=f"**Nije pronađena važeća veza:** {url}",
+                    description=f"**Nenhum link válido encontrado:** {url}",
                     color=disnake.Color.red()
                 ), ephemeral=True
             )
@@ -69,14 +69,14 @@ class GuildFavModal(disnake.ui.Modal):
         guild_data = await self.bot.get_data(inter.guild_id, db_name=DBModel.guilds)
 
         if not guild_data["player_controller"]["channel"] or not self.bot.get_channel(int(guild_data["player_controller"]["channel"])):
-            raise GenericError("**Nema konfigurisanog bota na serveru! Koristite naredbu /setup**")
+            raise GenericError("**Não há player configurado no servidor! Use o comando /setup**")
 
         name = inter.text_values["guild_fav_name"]
         description = inter.text_values["guild_fav_description"]
 
         if not guild_data["player_controller"]["channel"] or not self.bot.get_channel(
                 int(guild_data["player_controller"]["channel"])):
-            raise GenericError("**Nema konfigurisanog bota na serveru! Koristite naredbu /setup**")
+            raise GenericError("**Não há player configurado no servidor! Use o comando /setup**")
 
         try:
             if name != self.name:
@@ -90,8 +90,8 @@ class GuildFavModal(disnake.ui.Modal):
 
         guild = inter.guild or self.bot.get_guild(inter.guild_id)
 
-        await inter.edit_original_message(embed=disnake.Embed(description="**Link je uspješno dodat/ažuriran na pinovima igrača!\n"
-                         "Članovi ga mogu koristiti direktno u player-kontroleru kada nije u upotrebi..**",
+        await inter.edit_original_message(embed=disnake.Embed(description="**Link adicionado/atualizado com sucesso nos fixos do player!\n"
+                         "Membros podem usá-lo diretamente no player-controller quando não estiver em uso.**",
                                                               color=self.bot.get_color(guild.me)), view=None)
 
         await self.bot.get_cog("PinManager").process_idle_embed(guild)
@@ -114,21 +114,21 @@ class GuildFavView(disnake.ui.View):
             fav_select.callback = self.select_callback
             self.add_item(fav_select)
 
-        favadd_button = disnake.ui.Button(label="Dodati", emoji="⭐")
+        favadd_button = disnake.ui.Button(label="Adicionar", emoji="⭐")
         favadd_button.callback = self.favadd_callback
         self.add_item(favadd_button)
 
         if data["player_controller"]["fav_links"]:
 
-            edit_button = disnake.ui.Button(label="Uredi", emoji="✍️")
+            edit_button = disnake.ui.Button(label="Editar", emoji="✍️")
             edit_button.callback = self.edit_callback
             self.add_item(edit_button)
 
-            remove_button = disnake.ui.Button(label="Izbrisi", emoji="♻️")
+            remove_button = disnake.ui.Button(label="Remover", emoji="♻️")
             remove_button.callback = self.remove_callback
             self.add_item(remove_button)
 
-        cancel_button = disnake.ui.Button(label="Otkaži", emoji="❌")
+        cancel_button = disnake.ui.Button(label="Cancelar", emoji="❌")
         cancel_button.callback = self.cancel_callback
         self.add_item(cancel_button)
 
@@ -137,14 +137,14 @@ class GuildFavView(disnake.ui.View):
         if isinstance(self.ctx, CustomContext):
             try:
                 await self.message.edit(
-                    embed=disnake.Embed(description="**Vrijeme je isteklo...**", color=self.bot.get_color()), view=None
+                    embed=disnake.Embed(description="**Tempo esgotado...**", color=self.bot.get_color()), view=None
                 )
             except:
                 pass
 
         else:
             await self.ctx.edit_original_message(
-                embed=disnake.Embed(description="**Vrijeme je isteklo...**", color=self.bot.get_color()), view=None
+                embed=disnake.Embed(description="**Tempo esgotado...**", color=self.bot.get_color()), view=None
             )
         self.stop()
 
@@ -156,7 +156,7 @@ class GuildFavView(disnake.ui.View):
     async def edit_callback(self, inter: disnake.MessageInteraction):
 
         if not self.current:
-            await inter.send("Morate odabrati stavku!", ephemeral=True)
+            await inter.send("Você deve selecionar um item!", ephemeral=True)
             return
 
         try:
@@ -168,7 +168,7 @@ class GuildFavView(disnake.ui.View):
                 )
             )
         except KeyError:
-            await inter.send(f"**Nema favorita sa imenom:** {self.current}", ephemeral=True)
+            await inter.send(f"**Não há favorito com nome:** {self.current}", ephemeral=True)
             return
 
         if isinstance(self.ctx, disnake.AppCmdInter):
@@ -180,7 +180,7 @@ class GuildFavView(disnake.ui.View):
     async def remove_callback(self, inter: disnake.MessageInteraction):
 
         if not self.current:
-            await inter.send("Morate odabrati stavku!", ephemeral=True)
+            await inter.send("Você deve selecionar um item!", ephemeral=True)
             return
 
         await inter.response.defer(ephemeral=True)
@@ -190,14 +190,14 @@ class GuildFavView(disnake.ui.View):
         try:
             del guild_data["player_controller"]["fav_links"][self.current]
         except:
-            raise GenericError(f"**Ne postoje linkovi na listu sa imenom:** {self.current}")
+            raise GenericError(f"**Não há links da lista com o nome:** {self.current}")
 
         await self.bot.update_data(inter.guild_id, guild_data, db_name=DBModel.guilds)
 
         guild = self.bot.get_guild(inter.guild_id) or inter.guild
 
         await inter.edit_original_message(
-            embed=disnake.Embed(description="**Link je uspješno uklonjen!**", color=self.bot.get_color(guild.me)),
+            embed=disnake.Embed(description="**Link removido com sucesso!**", color=self.bot.get_color(guild.me)),
             view=None)
 
         await self.bot.get_cog("PinManager").process_idle_embed(guild)
@@ -206,7 +206,7 @@ class GuildFavView(disnake.ui.View):
     async def cancel_callback(self, inter: disnake.MessageInteraction):
         await inter.response.edit_message(
             embed=disnake.Embed(
-                description="**Operacija sa omiljenim serverima je otkazana...**",
+                description="**Operação com favoritos do servidor cancelada...**",
                 color=self.bot.get_color(),
             ), view=None
         )
@@ -256,13 +256,13 @@ class PinManager(commands.Cog):
 
     @commands.has_guild_permissions(manage_guild=True)
     @commands.command(name="serverplaylist", aliases=["spl", "svp", "svpl"],
-                      description="Upravljajte serverskim playlistama/favoritima.",
+                      description="Gerenciar playlists/favoritos do servidor.",
                       cooldown=server_playlist_cd)
     async def serverplaylist_legacy(self, ctx: CustomContext):
         await self.manager.callback(self=self, inter=ctx)
 
     @server_playlist.sub_command(
-        description=f"{desc_prefix}Upravljajte serverskim playlistama/favoritima."
+        description=f"{desc_prefix}Gerenciar playlists/favoritos do servidor."
     )
     async def manager(self, inter: disnake.AppCmdInter):
 
@@ -278,7 +278,7 @@ class PinManager(commands.Cog):
         view = GuildFavView(bot=bot, ctx=inter, data=guild_data)
 
         embed = disnake.Embed(
-            description="**Server Bookmark Manager.**",
+            description="**Gerenciador de favoritos do servidor.**",
             colour=self.bot.get_color(),
         )
 
@@ -298,19 +298,19 @@ class PinManager(commands.Cog):
 
     @commands.cooldown(1, 20, commands.BucketType.guild)
     @server_playlist.sub_command(
-        name="import", description=f"{desc_prefix}Uvezite linkove iz arh. json za listu linkova servera."
+        name="import", description=f"{desc_prefix}Importar links de arq. json para a lista de links do servidor."
     )
     async def import_(
             self,
             inter: disnake.ApplicationCommandInteraction,
-            file: disnake.Attachment = commands.Param(name="fajl", description="datoteka u .json formatu")
+            file: disnake.Attachment = commands.Param(name="arquivo", description="arquivo em formato .json")
     ):
 
         if file.size > 2097152:
-            raise GenericError("**Veličina fajla ne može biti veća od 2Mb!**")
+            raise GenericError("**O tamanho do arquivo não pode ultrapassar 2Mb!**")
 
         if not file.filename.endswith(".json"):
-            raise GenericError("**Nevažeći tip datoteke!**")
+            raise GenericError("**Tipo de arquivo inválido!**")
 
         inter, bot = await select_bot_pool(inter)
 
@@ -323,7 +323,7 @@ class PinManager(commands.Cog):
             data = (await file.read()).decode('utf-8')
             json_data = json.loads(data)
         except Exception as e:
-            raise GenericError("**Došlo je do greške pri čitanju datoteke, pregledajte je i ponovo koristite naredbu.**\n"
+            raise GenericError("**Ocorreu um erro ao ler o arquivo, por favor revise-o e use o comando novamente.**\n"
                                f"```py\n{repr(e)}```")
 
         for name, data in json_data.items():
@@ -332,35 +332,35 @@ class PinManager(commands.Cog):
                 continue
 
             if len(data['url']) > (max_url_chars := bot.config["USER_FAV_MAX_URL_LENGTH"]):
-                raise GenericError(f"**Stavka u vašoj datoteci premašuje dozvoljeni broj znakova:{max_url_chars}\nURL:** {data['url']}")
+                raise GenericError(f"**Um item de seu arquiv ultrapassa a quantidade de caracteres permitido:{max_url_chars}\nURL:** {data['url']}")
 
             if len(data['description']) > 50:
-                raise GenericError(f"**Stavka u vašoj datoteci premašuje dozvoljeni broj znakova:{max_url_chars}\nDescrição:** {data['description']}")
+                raise GenericError(f"**Um item de seu arquivo ultrapassa a quantidade de caracteres permitido:{max_url_chars}\nDescrição:** {data['description']}")
 
             if not isinstance(data['url'], str) or not URL_REG.match(data['url']):
-                raise GenericError(f"Vaš fajl sadrži nevažeći link: ```ldif\n{data['url']}```")
+                raise GenericError(f"O seu arquivo contém link inválido: ```ldif\n{data['url']}```")
 
         guild_data = await self.bot.get_data(inter.guild_id, db_name=DBModel.guilds)
 
         if not guild_data["player_controller"]["channel"] or not bot.get_channel(int(guild_data["player_controller"]["channel"])):
-            raise GenericError("**Nema konfigurisanog bota na serveru! Koristite naredbu /setup**")
+            raise GenericError("**Não há player configurado no servidor! Use o comando /setup**")
 
         for name in json_data.keys():
             if len(name) > (max_name_chars := 25):
-                raise GenericError(f"**Stavka iz vašeg fajla ({name}) premašuje dozvoljeni broj znakova:{max_name_chars}**")
+                raise GenericError(f"**Um item de seu arquivo ({name}) ultrapassa a quantidade de caracteres permitido:{max_name_chars}**")
             try:
                 del guild_data["player_controller"]["fav_links"][name]
             except KeyError:
                 continue
 
         if (json_size:=len(json_data)) > 25:
-            raise GenericError(f"Broj stavki u arhivi premašuje maksimalno dozvoljeni broj (25).")
+            raise GenericError(f"A quantidade de itens no no arquivo excede a quantidade máxima permitida (25).")
 
         if (json_size + (user_favs:=len(guild_data["player_controller"]["fav_links"]))) > 25:
-            raise GenericError("Playlist/playlist servera nema dovoljno prostora za dodavanje svih stavki iz vašeg fajla...\n"
-                                f"Granica: 25\n"
-                                f"Broj sačuvanih linkova: {user_favs}\n"
-                                f"Trebaš da: {(json_size + user_favs)-25}")
+            raise GenericError("A lista de músicas/playlist do servidor não possui espaço suficiente para adicionar todos os itens de seu arquivo...\n"
+                                f"Limite atual: 25\n"
+                                f"Quantidade de links salvos: {user_favs}\n"
+                                f"Você precisa de: {(json_size + user_favs)-25}")
 
         guild_data["player_controller"]["fav_links"].update(json_data)
 
@@ -371,8 +371,8 @@ class PinManager(commands.Cog):
         await inter.edit_original_message(
             embed = disnake.Embed(
                 color=self.bot.get_color(guild.me),
-                description = "**Linkovi su uspješno uvezeni!**\n"
-                              "**Oni će se pojaviti kada plejer nije u upotrebi ili u stanju pripravnosti..**",
+                description = "**Os links foram importados com sucesso!**\n"
+                              "**Eles vão aparecer quando o player não tiver em uso ou em modo de espera.**",
             ), view=None
         )
 
@@ -380,7 +380,7 @@ class PinManager(commands.Cog):
 
     @commands.cooldown(1, 20, commands.BucketType.guild)
     @server_playlist.sub_command(
-        description=f"{desc_prefix}Izvezite fiksne linkove pjesama/liste za reprodukciju na serveru u json datoteku."
+        description=f"{desc_prefix}Exportar os links de músicas/playlists fixas do servidor em um arquivo json."
     )
     async def export(self, inter: disnake.ApplicationCommandInteraction):
 
@@ -394,16 +394,16 @@ class PinManager(commands.Cog):
         guild_data = await bot.get_data(inter.guild_id, db_name=DBModel.guilds)
 
         if not guild_data["player_controller"]["fav_links"]:
-            raise GenericError(f"**Na serveru nema zakačenih pesama/lista za reprodukciju..\n"
-                               f"Možete dodati pomoću naredbe: /{self.server_playlist.name} {self.export.name}**")
+            raise GenericError(f"**Não há músicas/playlists fixadas no servidor..\n"
+                               f"Você pode adicionar usando o comando: /{self.server_playlist.name} {self.export.name}**")
 
         fp = BytesIO(bytes(json.dumps(guild_data["player_controller"]["fav_links"], indent=4), 'utf-8'))
 
         guild = bot.get_guild(inter.guild_id) or inter.guild
 
         embed = disnake.Embed(
-            description=f"**Ovdje se nalaze fiksni podaci o pjesmi/listama za reprodukciju na serveru.\n"
-                        f"Možete uvesti pomoću naredbe:** `/{self.server_playlist.name} {self.import_.name}`",
+            description=f"**Os dados dos links de músicas/playlists fixas do servidor estão aqui.\n"
+                        f"Você pode importar usando o comando:** `/{self.server_playlist.name} {self.import_.name}`",
             color=self.bot.get_color(guild.me))
 
         await inter.edit_original_message(embed=embed, file=disnake.File(fp=fp, filename="guild_favs.json"), view=None)
