@@ -38,7 +38,7 @@ class Music(commands.Cog):
     ]
 
     playlist_opts = [
-        disnake.OptionChoice("Mix", "shuffle"),
+        disnake.OptionChoice("Misturar Playlist", "shuffle"),
         disnake.OptionChoice("Inverter Playlist", "reversed"),
     ]
 
@@ -106,7 +106,7 @@ class Music(commands.Cog):
 
         await self.update_cache()
 
-        await ctx.send("Pjesme sa linka su uspješno keširane.", delete_after=30)
+        await ctx.send("As músicas do link foram adicionadas com sucesso em cache.", delete_after=30)
 
     @commands.is_owner()
     @commands.cooldown(1, 300, commands.BucketType.default)
@@ -119,9 +119,9 @@ class Music(commands.Cog):
 
         try:
             if not self.bot.pool.playlist_cache:
-                raise GenericError("**Keš plejliste je prazna...**")
+                raise GenericError("**Seu cache de playlist está vazio...**")
         except KeyError:
-            raise GenericError(f"**Još niste koristili naredbu: {ctx.prefix}{self.addcache.name}**")
+            raise GenericError(f"**Você ainda não usou o comando: {ctx.prefix}{self.addcache.name}**")
 
         msg = None
 
@@ -186,11 +186,11 @@ class Music(commands.Cog):
         try:
             del self.bot.pool.playlist_cache[url]
         except KeyError:
-            raise GenericError("**Nema keširanih stavki sa datim url-om...**")
+            raise GenericError("**Não há itens salvo em cache com a url informada...**")
 
         await self.update_cache()
 
-        await ctx.send("Pjesme linkova su uspješno uklonjene iz keš memorije.", delete_after=30)
+        await ctx.send("As músicas do link foram removidas com sucesso do cache.", delete_after=30)
 
     @commands.is_owner()
     @commands.command(hidden=True, aliases=["cc"])
@@ -199,11 +199,11 @@ class Music(commands.Cog):
         try:
             self.bot.pool.playlist_cache.clear()
         except KeyError:
-            raise GenericError("**Nemate keširanih linkova za plejlistu...**")
+            raise GenericError("**Você não possui links de playlists salva em cache...**")
 
         await self.update_cache()
 
-        await ctx.send("Keš plejliste je uspješno obrisan.", delete_after=30)
+        await ctx.send("O cache de playlist foi limpo com sucesso.", delete_after=30)
 
     @commands.is_owner()
     @commands.command(hidden=True, aliases=["ec"])
@@ -222,7 +222,7 @@ class Music(commands.Cog):
 
         await self.update_cache()
 
-        await ctx.send("Keš datoteka je uspješno uvezena!", delete_after=30)
+        await ctx.send("O arquivo de cache foi importado com sucesso!", delete_after=30)
 
     stage_cd = commands.CooldownMapping.from_cooldown(2, 45, commands.BucketType.guild)
     stage_mc = commands.MaxConcurrency(1, per=commands.BucketType.guild, wait=False)
@@ -231,16 +231,16 @@ class Music(commands.Cog):
     @commands.has_guild_permissions(manage_guild=True)
     @pool_command(
         only_voiced=True, name="stageannounce", aliases=["stagevc", "togglestageannounce"], hidden=True,
-        description="Aktivirajte automatsku najavu bine sa nazivom pjesme.\n\n"
+        description="Ativar o sistema de anuncio automático do palco com o nome da música.\n\n"
                     "Placeholders:\n"
-                    "{track.title} -> Naziv pjesme\n"
-                    "{track.author} -> Ime izvođača/prenosioca/autora pjesme.\n"
-                    "{track.duration} -> Trajanje pesme.\n"
-                    "{track.source} -> Izvor/izvor muzike (Youtube/Spotify/Soundcloud itd.)\n"
-                    "{track.playlist} -> Naziv plejliste izvora muzike (ako postoji)\n"
-                    "{requester.name} -> Ime/nadimak člana koji je zatražio pjesmu\n"
-                    "{requester.tag} -> Tag člana koji je tražio pjesmu\n"
-                    "{requester.id} -> ID člana koji je zatražio pjesmu\n",
+                    "{track.title} -> Nome da música\n"
+                    "{track.author} -> Nome do Artista/Uploader/Author da música.\n"
+                    "{track.duration} -> Duração da música.\n"
+                    "{track.source} -> Origem/Fonte da música (Youtube/Spotify/Soundcloud etc)\n"
+                    "{track.playlist} -> Nome da playlist de origem da música (caso tenha)\n"
+                    "{requester.name} -> Nome/Nick do membro que pediu a música\n"
+                    "{requester.tag} -> Tag/Discriminator do membro que pediu a música\n"
+                    "{requester.id} -> ID do membro que pediu a música\n",
         cooldown=stage_cd, max_concurrency=stage_mc, extras={"exclusive_cooldown": True},
     )
     async def stageannounce_legacy(self, ctx: CustomContext, *, template: str = None):
@@ -249,7 +249,7 @@ class Music(commands.Cog):
 
     @has_source()
     @commands.slash_command(
-        description=f"{desc_prefix}Aktivirajte/uredite automatski sistem najave bine sa nazivom pjesme.",
+        description=f"{desc_prefix}Ativar/editar o sistema de anuncio automático do palco com o nome da música.",
         extras={"only_voiced": True, "exclusive_cooldown": True},
         default_member_permissions=disnake.Permissions(manage_guild=True), cooldown=stage_cd, max_concurrency=stage_mc
     )
@@ -270,10 +270,10 @@ class Music(commands.Cog):
             guild = inter.guild
 
         if not isinstance(guild.me.voice.channel, disnake.StageChannel):
-            raise GenericError("**Morate biti u kanalu da biste uključili/isključili ovaj sistem.**")
+            raise GenericError("**Você deve estar em um canal de palco para ativar/desativar esse sistema.**")
 
         if not guild.me.voice.channel.permissions_for(guild.me).mute_members:
-            raise GenericError(f"**{bot.user.mention} potrebna je dozvola da isključite zvuk članova.**")
+            raise GenericError(f"**{bot.user.mention} precisa da permissão de silenciar membros.**")
 
         player: LavalinkPlayer = bot.music.players[inter.guild_id]
 
@@ -282,30 +282,30 @@ class Music(commands.Cog):
 
         if player.stage_title_event and player.stage_title_template == template:
 
-            raise GenericError("**Automatska najava pozornice je sada omogućena (i nije bilo promjena u "
-                               "predložak naslova).\n"
-                               "Ako želite da ga onemogućite, možete zaustaviti igrača (svi članovi pozornice će biti"
-                               "automatski prekinut u ovom procesu).**")
+            raise GenericError("**O anúncio automático do palco já está ativado (e não houve alterações no "
+                               "template do título).\n"
+                               "Caso queira desativar você pode parar o player (todos os membros do palco serão "
+                               "desconectados automaticamente nesse processo).**")
 
         player.stage_title_event = True
         player.stage_title_template = template
         player.start_time = disnake.utils.utcnow()
 
-        txt = [f"Omogućen/promijenjen automatski sistem najave pozornice.",
-               f"📢 **⠂{inter.author.mention} Omogućen/promijenjen automatski sistem najave pozornice "
+        txt = [f"ativou/Alterou o sistema de anúncio automático do palco.",
+               f"📢 **⠂{inter.author.mention} ativou/alterou o sistema de anúncio automático do palco "
                f"{guild.me.voice.channel.mention}.**\n\n"
-               f"`Napomena: Ako je plejer isključen, svi članovi bine će se automatski isključiti.`\n\n"
-               f"**Model:** `{disnake.utils.escape_markdown(template)}`"]
+               f"`Nota: Caso o player seja desligado, todos os membros do palco serão desconectados automaticamente.`\n\n"
+               f"**Modelo usado:** `{disnake.utils.escape_markdown(template)}`"]
 
         await self.interaction_message(inter, txt, emoji="📢", force=True)
 
     @stage_announce.autocomplete("template")
-    async def fav_add_autocomplete(self, inter: disnake.Interaction, query: str):
+    async def stage_announce_autocomplete(self, inter: disnake.Interaction, query: str):
 
         return [
-            "Muzika: {track.title} | {track.author}",
-            "{track.title} | Zahtjev od: {requester.name}#{requester.tag}",
-            "Radio 24/7 | {track.title}",
+            "Tocando: {track.title} | {track.author}",
+            "{track.title} | Pedido por: {requester.name}#{requester.tag}",
+            "Rádio 24/7 | {track.title}",
             "{track.title} | Playlist: {track.playlist}",
         ]
 
@@ -319,7 +319,7 @@ class Music(commands.Cog):
     async def message_play(self, inter: disnake.MessageCommandInteraction):
 
         if not inter.target.content:
-            emb = disnake.Embed(description=f"Nema teksta [mensagem]({inter.target.jump_url}) odabranog...",
+            emb = disnake.Embed(description=f"Não há texto na [mensagem]({inter.target.jump_url}) selecionada...",
                                 color=disnake.Colour.red())
             await inter.send(embed=emb, ephemeral=True)
             return
@@ -339,32 +339,32 @@ class Music(commands.Cog):
     @check_voice()
     @can_send_message_check()
     @commands.slash_command(name="search", extras={"check_player": False}, cooldown=play_cd, max_concurrency=play_mc,
-                            description=f"{desc_prefix}Potražite muziku i odaberite jednu od rezultata za reprodukciju.")
+                            description=f"{desc_prefix}Buscar música e escolher uma entre os resultados para tocar.")
     async def search(
             self,
             inter: disnake.AppCmdInter,
-            query: str = commands.Param(name="busca", desc="Naziv pjesme ili link."),
+            query: str = commands.Param(name="busca", desc="Nome ou link da música."),
             *,
-            position: int = commands.Param(name="posição", description=f"{desc_prefix}Postavite muziku u određenu poziciju",
+            position: int = commands.Param(name="posição", description=f"{desc_prefix}Colocar a música em uma posição específica",
                                            default=0),
             force_play: str = commands.Param(
                 name="tocar_agora",
-                description="Pustite pjesmu odmah (umjesto da je dodate u red čekanja).",
+                description="Tocar a música imediatamente (ao invés de adicionar na fila).",
                 default="no",
                 choices=[
                     disnake.OptionChoice(disnake.Localized("Yes", data={disnake.Locale.pt_BR: "Sim"}), "yes"),
                     disnake.OptionChoice(disnake.Localized("No", data={disnake.Locale.pt_BR: "Não"}), "no")
                 ]
             ),
-            options: str = commands.Param(name="opções", description="Opcije za obradu plejliste",
+            options: str = commands.Param(name="opções", description="Opções para processar playlist",
                                           choices=playlist_opts, default=False),
             source: str = commands.Param(name="fonte",
-                                         description="Odaberite web lokaciju za pretraživanje muzike (ne linkove)",
+                                         description="Selecionar site para busca de músicas (não links)",
                                          choices=search_sources_opts,
                                          default="ytsearch"),
-            repeat_amount: int = commands.Param(name="repetições", description="podesiti broj ponavljanja.",
+            repeat_amount: int = commands.Param(name="repetições", description="definir quantidade de repetições.",
                                                 default=0),
-            server: str = commands.Param(name="server", desc="Koristite određeni muzički server u pretrazi.",
+            server: str = commands.Param(name="server", desc="Usar um servidor de música específico na busca.",
                                          default=None)
     ):
 
@@ -412,14 +412,14 @@ class Music(commands.Cog):
     @commands.max_concurrency(1, commands.BucketType.guild)
     @commands.slash_command(
         extras={"only_voiced": True},
-        description=f"{desc_prefix}Pridružite se glasovnom kanalu (ili pređite na jedan)."
+        description=f"{desc_prefix}Me conectar em um canal de voz (ou me mover para um)."
     )
     async def connect(
             self,
             inter: disnake.AppCmdInter,
             channel: Union[disnake.VoiceChannel, disnake.StageChannel] = commands.Param(
                 name="canal",
-                description="kanal za povezivanje"
+                description="Canal para me conectar"
             )
     ):
         try:
@@ -472,8 +472,8 @@ class Music(commands.Cog):
         except KeyError:
             print(f"Player debug test 20: {bot.user} | {self.bot.user}")
             raise GenericError(
-                f"**O {bot.user.mention}je završeno prije povezivanja na glasovni kanal "
-                f"(ili plejer nije inicijaliziran)...\nZa svaki slučaj pokušaj ponovo.**"
+                f"**O player do bot {bot.user.mention} foi finalizado antes de conectar no canal de voz "
+                f"(ou o player não foi inicializado)...\nPor via das dúvidas tente novamente.**"
             )
 
         can_connect(channel, me.guild, check_other_bots_in_vc=check_other_bots_in_vc)
@@ -491,8 +491,8 @@ class Music(commands.Cog):
 
             if channel != me.voice and me.voice.channel:
                 txt = [
-                    f"premjestio me na kanal <#{channel.id}>",
-                    f"**Uspješno premješten na kanal** <#{channel.id}>"
+                    f"me moveu para o canal <#{channel.id}>",
+                    f"**Movido com sucesso para o canal** <#{channel.id}>"
                 ]
 
                 deafen_check = False
@@ -500,8 +500,8 @@ class Music(commands.Cog):
 
             else:
                 txt = [
-                    f"spojio me na kanal <#{channel.id}>",
-                    f"**Povežite kanal** <#{channel.id}>"
+                    f"me conectou no canal <#{channel.id}>",
+                    f"**Conectei no canal** <#{channel.id}>"
                 ]
 
             await self.interaction_message(ctx, txt, emoji="🔈", rpc_update=True)
@@ -529,11 +529,11 @@ class Music(commands.Cog):
             if not await check_deafen(me):
                 await text_channel.send(
                     embed=disnake.Embed(
-                        title="Biljeska:",
-                        description="Da zadržite vašu privatnost i pomognete mi da uštedim "
-                                    "funkcije, preporučujem da isključite zvuk mog kanala klikom "
-                                    "desnim klikom na mene i onda označite: onemogućiti "
-                                    "audio na serveru.",
+                        title="Aviso:",
+                        description="Para manter sua privacidade e me ajudar a economizar "
+                                    "recursos, recomendo desativar meu áudio do canal clicando "
+                                    "com botão direito sobre mim e em seguida marcar: desativar "
+                                    "áudio no servidor.",
                         color=self.bot.get_color(me),
                     ).set_image(
                         url="https://cdn.discordapp.com/attachments/554468640942981147/1012533546386210956/unknown.png"
@@ -554,12 +554,12 @@ class Music(commands.Cog):
             else:
                 embed = disnake.Embed(color=self.bot.get_color(me))
 
-                embed.description = f"**Treba mi neko osoblje da me pozove da govorim na pozornici: " \
+                embed.description = f"**Preciso que algum staff me convide para falar no palco: " \
                                     f"[{channel.name}]({channel.jump_url}).**"
 
                 embed.set_footer(
-                    text="💡 Nagoveštaj: Da biste mi omogućili da automatski govorim na sceni, moraćete da mi odobrite "
-                         "dozvola za isključivanje zvuka članova (na serveru ili samo na odabranom kanalu pozornice).")
+                    text="💡 Dica: para me permitir falar no palco automaticamente será necessário me conceder "
+                         "permissão de silenciar membros (no servidor ou apenas no canal de palco escolhido).")
 
                 await text_channel.send(ctx.author.mention, embed=embed, delete_after=45)
 
@@ -572,35 +572,35 @@ class Music(commands.Cog):
     async def addpos_legacy(self, ctx: CustomContext, position: Optional[int] = None, *, query: str = None):
 
         if not position:
-            raise GenericError("Niste naveli važeću poziciju.**")
+            raise GenericError("Você não informou uma posição válida.**")
 
         if position < 1:
-            raise GenericError("**Broj pozicije u redu mora biti 1 ili veći.**")
+            raise GenericError("**Número da posição da fila tem que ser 1 ou superior.**")
 
         if not query:
-            raise GenericError("Niste dodali naziv pjesme ili link.**")
+            raise GenericError("Você não adicionou um nome ou link de uma música.**")
 
         await self.play.callback(self=self, inter=ctx, query=query, position=position, options=False,
                                  force_play="no", manual_selection=False,
                                  source="ytsearch", repeat_amount=0, server=None)
 
     play_flags = argparse.ArgumentParser(exit_on_error=False)
-    play_flags.add_argument('query', nargs='*', help="naziv pjesme ili link")
-    play_flags.add_argument('-position', '-pos', '-p', type=int, default=0, help='Postavite muziku u određenu poziciju. Ex: -p 10')
-    play_flags.add_argument('-next', '-proximo', action='store_true', help='Dodajte pjesmu/listu za reprodukciju na vrh reda (ekvivalentno: -pos 1)')
-    play_flags.add_argument('-reverse', '-r', action='store_true', help='Obrnuti redoslijed dodanih pjesama (efikasno samo pri dodavanju plejliste).')
-    play_flags.add_argument('-shuffle', '-sl', action='store_true', help='Nasumično dodane pjesme (efikasno samo pri dodavanju plejliste).')
-    play_flags.add_argument('-select', '-s', action='store_true', help='Izaberite muziku iz pronađenih rezultata.')
-    play_flags.add_argument('-source', '-scr', type=str, default="ytsearch", help='Tražite muziku koristeći određeni izvor [youtube/soundcloud etc]')
-    play_flags.add_argument('-force', '-now', '-n', '-f', action='store_true', help='Pustite dodatu pjesmu odmah (efikasno samo ako se trenutno reprodukuje pjesma.)')
-    play_flags.add_argument('-loop', '-lp', type=int, default=0, help="Postavite broj ponavljanja odabrane pjesme. Ex: -loop 5")
-    play_flags.add_argument('-server', '-sv', type=str, default=None, help='Koristite određeni muzički server.')
+    play_flags.add_argument('query', nargs='*', help="nome ou link da música")
+    play_flags.add_argument('-position', '-pos', '-p', type=int, default=0, help='Colocar a música em uma posição específica. Ex: -p 10')
+    play_flags.add_argument('-next', '-proximo', action='store_true', help='Adicionar a música/playlist no topo da fila (equivalente ao: -pos 1)')
+    play_flags.add_argument('-reverse', '-r', action='store_true', help='Inverter a ordem das músicas adicionadas (efetivo apenas ao adicionar playlist).')
+    play_flags.add_argument('-shuffle', '-sl', action='store_true', help='Misturar as músicas adicionadas (efetivo apenas ao adicionar playlist).')
+    play_flags.add_argument('-select', '-s', action='store_true', help='Escolher a música entre os resultados encontrados.')
+    play_flags.add_argument('-source', '-scr', type=str, default="ytsearch", help='Fazer a busca da música usando uma fonte específica [youtube/soundcloud etc]')
+    play_flags.add_argument('-force', '-now', '-n', '-f', action='store_true', help='Tocar a música adicionada imediatamente (efetivo apenas se houver uma música tocando atualmente.)')
+    play_flags.add_argument('-loop', '-lp', type=int, default=0, help="Definir a quantidade de repetições da música escolhida. Ex: -loop 5")
+    play_flags.add_argument('-server', '-sv', type=str, default=None, help='Usar um servidor de música específico.')
 
     @can_send_message_check()
     @check_voice()
     @commands.bot_has_guild_permissions(send_messages=True)
     @commands.max_concurrency(1, commands.BucketType.member)
-    @pool_command(name="play", description="Pustite muziku na glasovnom kanalu.", aliases=["p"], check_player=False,
+    @pool_command(name="play", description="Tocar música em um canal de voz.", aliases=["p"], check_player=False,
                   cooldown=play_cd, max_concurrency=play_mc)
     async def play_legacy(self, ctx: CustomContext, *, flags: str = ""):
 
@@ -622,12 +622,12 @@ class Music(commands.Cog):
     @can_send_message_check()
     @check_voice()
     @commands.bot_has_guild_permissions(send_messages=True)
-    @pool_command(name="search", description="Potražite pjesme i odaberite jednu od rezultata za reprodukciju.",
+    @pool_command(name="search", description="Pesquisar por músicas e escolher uma entre os resultados para tocar.",
                   aliases=["sc"], check_player=False, cooldown=play_cd, max_concurrency=play_mc)
     async def search_legacy(self, ctx: CustomContext, *, query: str = None):
 
         if not query:
-            raise GenericError("**Niste dodali ime ili link za pustiti.**")
+            raise GenericError("**Você não adicionou um nome ou link para tocar.**")
 
         await self.play.callback(self=self, inter=ctx, query=query, position=0, options=False, force_play="no",
                                  manual_selection=True, source="ytsearch", repeat_amount=0, server=None)
@@ -636,29 +636,29 @@ class Music(commands.Cog):
     @check_voice()
     @commands.slash_command(
         name=disnake.Localized("play_nusic_file", data={disnake.Locale.pt_BR: "tocar_arquivo"}),
-        description=f"{desc_prefix}Pustite muzički fajl na glasovnom kanalu.",
+        description=f"{desc_prefix}Tocar arquivo de música em um canal de voz.",
         extras={"check_player": False}, cooldown=play_cd, max_concurrency=play_mc
     )
     async def play_file(
             self,
             inter: Union[disnake.AppCmdInter, CustomContext],
             file: disnake.Attachment = commands.Param(
-                name="fajl", description="audio fajl za reprodukciju ili dodavanje u red čekanja"
+                name="arquivo", description="arquivo de audio para tocar ou adicionar na fila"
             ),
-            position: int = commands.Param(name="pozicija", description="Postavite muziku u određenu poziciju",
+            position: int = commands.Param(name="posição", description="Colocar a música em uma posição específica",
                                            default=0),
             force_play: str = commands.Param(
                 name="tocar_agora",
-                description="Pusti pjesmu odmah (umjesto dodavanja u red čekanja).",
+                description="Tocar a música imediatamente (ao invés de adicionar na fila).",
                 default="no",
                 choices=[
-                    disnake.OptionChoice(disnake.Localized("Yes", data={disnake.Locale.pt_BR: "Da"}), "yes"),
-                    disnake.OptionChoice(disnake.Localized("No", data={disnake.Locale.pt_BR: "Ne"}), "no")
+                    disnake.OptionChoice(disnake.Localized("Yes", data={disnake.Locale.pt_BR: "Sim"}), "yes"),
+                    disnake.OptionChoice(disnake.Localized("No", data={disnake.Locale.pt_BR: "Não"}), "no")
                 ]
             ),
-            repeat_amount: int = commands.Param(name="ponavljanja", description="podesiti broj ponavljanja.",
+            repeat_amount: int = commands.Param(name="repetições", description="definir quantidade de repetições.",
                                                 default=0),
-            server: str = commands.Param(name="server", desc="Koristite određeni muzički server u pretrazi.",
+            server: str = commands.Param(name="server", desc="Usar um servidor de música específico na busca.",
                                          default=None),
     ):
 
@@ -674,36 +674,36 @@ class Music(commands.Cog):
     @check_voice()
     @commands.slash_command(
         name=disnake.Localized("play", data={disnake.Locale.pt_BR: "tocar"}),
-        description=f"{desc_prefix}Pustite muziku na glasovnom kanalu.",
+        description=f"{desc_prefix}Tocar música em um canal de voz.",
         extras={"check_player": False}, cooldown=play_cd, max_concurrency=play_mc
     )
     async def play(
             self,
             inter: Union[disnake.AppCmdInter, CustomContext],
-            query: str = commands.Param(name="traži", desc="Naziv pjesme ili link."), *,
-            position: int = commands.Param(name="pozicija", description="Postavite muziku u određenu poziciju",
+            query: str = commands.Param(name="busca", desc="Nome ou link da música."), *,
+            position: int = commands.Param(name="posição", description="Colocar a música em uma posição específica",
                                            default=0),
             force_play: str = commands.Param(
                 name="tocar_agora",
-                description="Pusti pjesmu odmah (umjesto dodavanja u red čekanja).",
+                description="Tocar a música imediatamente (ao invés de adicionar na fila).",
                 default="no",
                 choices=[
-                    disnake.OptionChoice(disnake.Localized("Yes", data={disnake.Locale.pt_BR: "Da"}), "yes"),
-                    disnake.OptionChoice(disnake.Localized("No", data={disnake.Locale.pt_BR: "Ne"}), "no")
+                    disnake.OptionChoice(disnake.Localized("Yes", data={disnake.Locale.pt_BR: "Sim"}), "yes"),
+                    disnake.OptionChoice(disnake.Localized("No", data={disnake.Locale.pt_BR: "Não"}), "no")
                 ]
             ),
             manual_selection: bool = commands.Param(name="selecionar_manualmente",
-                                                    description="Odaberite pjesmu ručno iz pronađenih rezultata",
+                                                    description="Escolher uma música manualmente entre os resultados encontrados",
                                                     default=False),
-            options: str = commands.Param(name="opcije", description="Opcije za obradu plejliste",
+            options: str = commands.Param(name="opções", description="Opções para processar playlist",
                                           choices=playlist_opts, default=False),
-            source: str = commands.Param(name="izvor",
-                                         description="Odaberite web lokaciju za pretraživanje muzike (ne linkove)",
+            source: str = commands.Param(name="fonte",
+                                         description="Selecionar site para busca de músicas (não links)",
                                          choices=search_sources_opts,
                                          default="ytsearch"),
-            repeat_amount: int = commands.Param(name="ponavljanja", description="podesiti broj ponavljanja.",
+            repeat_amount: int = commands.Param(name="repetições", description="definir quantidade de repetições.",
                                                 default=0),
-            server: str = commands.Param(name="server", desc="Koristite određeni muzički server u pretrazi.",
+            server: str = commands.Param(name="server", desc="Usar um servidor de música específico na busca.",
                                          default=None),
     ):
 
