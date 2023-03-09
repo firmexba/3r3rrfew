@@ -22,12 +22,12 @@ class UserFavModal(disnake.ui.Modal):
         self.name = name
 
         super().__init__(
-            title="Adicionar/Editar playlist/favorito",
+            title="Dodaj/uredi plejlistu/favorite",
             custom_id="user_fav_edit",
             timeout=180,
             components=[
                 disnake.ui.TextInput(
-                    label="Nome da playlist/favorito:",
+                    label="Ime plejliste/favoriti:",
                     custom_id="user_fav_name",
                     min_length=2,
                     max_length=25,
@@ -52,7 +52,7 @@ class UserFavModal(disnake.ui.Modal):
         except IndexError:
             await inter.send(
                 embed=disnake.Embed(
-                    description=f"**Nenhum link válido encontrado:** {url}",
+                    description=f"**Nije pronađena važeća veza:** {url}",
                     color=disnake.Color.red()
                 ), ephemeral=True
             )
@@ -78,11 +78,11 @@ class UserFavModal(disnake.ui.Modal):
 
         await inter.edit_original_message(
             embed=disnake.Embed(
-                description="**Link salvo/atualizado com sucesso nos seus favoritos!\n"
-                            "Ele vai aparecer nas seguintes ocasições:** ```\n"
-                            "- Ao usar o comando /play (no preenchimento automático da busca)\n"
-                            "- Ao clicar no botão de pedir música do player.\n"
-                            "- Ao usar o comando play (prefixed) sem nome ou link.```",
+                description="**Link je uspješno sačuvan/ažuriran u vaše favorite!\n"
+                            "On će se pojaviti u sljedećim prilikama:** ```\n"
+                            "- Kada koristite naredbu /play (pri automatskom dovršavanju pretrage)\n"
+                            "- Klikom na dugme Zatraži muzički plejer.\n"
+                            "- Kada koristite naredbu play (sa prefiksom) bez imena ili veze.```",
                 color=self.bot.get_color(guild.me)
             )
         )
@@ -105,25 +105,25 @@ class UserFavView(disnake.ui.View):
             fav_select.callback = self.select_callback
             self.add_item(fav_select)
 
-        favadd_button = disnake.ui.Button(label="Adicionar", emoji="⭐")
+        favadd_button = disnake.ui.Button(label="Dodati", emoji="⭐")
         favadd_button.callback = self.favadd_callback
         self.add_item(favadd_button)
 
         if data["fav_links"]:
 
-            edit_button = disnake.ui.Button(label="Editar", emoji="✍️")
+            edit_button = disnake.ui.Button(label="Uredi", emoji="✍️")
             edit_button.callback = self.edit_callback
             self.add_item(edit_button)
 
-            remove_button = disnake.ui.Button(label="Remover", emoji="♻️")
+            remove_button = disnake.ui.Button(label="Izbrisi", emoji="♻️")
             remove_button.callback = self.remove_callback
             self.add_item(remove_button)
 
-            clear_button = disnake.ui.Button(label="Limpar favoritos", emoji="🚮")
+            clear_button = disnake.ui.Button(label="Favoriti", emoji="🚮")
             clear_button.callback = self.clear_callback
             self.add_item(clear_button)
 
-        cancel_button = disnake.ui.Button(label="Cancelar", emoji="❌")
+        cancel_button = disnake.ui.Button(label="Otkaži", emoji="❌")
         cancel_button.callback = self.cancel_callback
         self.add_item(cancel_button)
 
@@ -132,14 +132,14 @@ class UserFavView(disnake.ui.View):
         if isinstance(self.ctx, CustomContext):
             try:
                 await self.message.edit(
-                    embed=disnake.Embed(description="**Tempo esgotado...**", color=self.bot.get_color()), view=None
+                    embed=disnake.Embed(description="**Vrijeme je isteklo...**", color=self.bot.get_color()), view=None
                 )
             except:
                 pass
 
         else:
             await self.ctx.edit_original_message(
-                embed=disnake.Embed(description="**Tempo esgotado...**", color=self.bot.get_color()), view=None
+                embed=disnake.Embed(description="**Vrijeme je isteklo...**", color=self.bot.get_color()), view=None
             )
         self.stop()
 
@@ -151,7 +151,7 @@ class UserFavView(disnake.ui.View):
     async def edit_callback(self, inter: disnake.MessageInteraction):
 
         if not self.current:
-            await inter.send("Você deve selecionar um item!", ephemeral=True)
+            await inter.send("Morate odabrati stavku!", ephemeral=True)
             return
 
         try:
@@ -162,7 +162,7 @@ class UserFavView(disnake.ui.View):
                 )
             )
         except KeyError:
-            await inter.send(f"**Não há favorito com o nome:** {self.current}", ephemeral=True)
+            await inter.send(f"**Ne postoji favorit sa imenom:** {self.current}", ephemeral=True)
             return
 
         if isinstance(self.ctx, disnake.AppCmdInter):
@@ -174,7 +174,7 @@ class UserFavView(disnake.ui.View):
     async def remove_callback(self, inter: disnake.MessageInteraction):
 
         if not self.current:
-            await inter.send("Você deve selecionar um item!", ephemeral=True)
+            await inter.send("Morate odabrati stavku!", ephemeral=True)
             return
 
         await inter.response.defer(ephemeral=True)
@@ -184,7 +184,7 @@ class UserFavView(disnake.ui.View):
         try:
             del user_data["fav_links"][self.current]
         except:
-            raise GenericError(f"**Não há favorito na lista com o nome:** {self.current}")
+            raise GenericError(f"**Na listi nema favorita sa imenom:** {self.current}")
 
         await self.bot.update_global_data(inter.author.id, user_data, db_name=DBModel.users)
 
@@ -192,7 +192,7 @@ class UserFavView(disnake.ui.View):
 
         await inter.edit_original_message(
             embed=disnake.Embed(
-                description="**Link/Favorito foi removido com sucesso!**",
+                description="**Link/Favorite je uspješno uklonjen!**",
                 color=self.bot.get_color(guild.me)),
             view=None
         )
@@ -205,14 +205,14 @@ class UserFavView(disnake.ui.View):
         data = await self.bot.get_global_data(inter.author.id, db_name=DBModel.users)
 
         if not data["fav_links"]:
-            raise GenericError("**Você não possui links favoritos!**")
+            raise GenericError("**Nemate omiljenih linkova!**")
 
         data["fav_links"].clear()
 
         await self.bot.update_global_data(inter.author.id, data, db_name=DBModel.users)
 
         embed = disnake.Embed(
-            description="Sua lista de favoritos foi limpa com sucesso!",
+            description="Vaša lista favorita je uspješno obrisana!",
             color=self.bot.get_color()
         )
 
@@ -222,7 +222,7 @@ class UserFavView(disnake.ui.View):
     async def cancel_callback(self, inter: disnake.MessageInteraction):
         await inter.response.edit_message(
             embed=disnake.Embed(
-                description="**Operação com favoritos cancelada...**",
+                description="**Operacija sa favoritima je otkazana...**",
                 color=self.bot.get_color(),
             ), view=None
         )
@@ -248,12 +248,12 @@ class FavManager(commands.Cog):
         pass
 
     @commands.command(name="favmanager", aliases=["favs", "favoritos", "fvmgr"],
-                      description="Gerenciar suas playlists/favoritos.", cooldown=fav_cd)
+                      description="Upravljajte svojim listama za reprodukciju/favoritima.", cooldown=fav_cd)
     async def favmanager_legacy(self, ctx: CustomContext):
         await self.manager.callback(self=self, inter=ctx)
 
     @fav.sub_command(
-        description=f"{desc_prefix}Gerenciar suas playlists/favoritos.", cooldown=fav_cd
+        description=f"{desc_prefix}Upravljajte svojim listama za reprodukciju/favoritima.", cooldown=fav_cd
     )
     async def manager(self, inter: disnake.AppCmdInter):
 
@@ -264,7 +264,7 @@ class FavManager(commands.Cog):
         view = UserFavView(bot=self.bot, ctx=inter, data=user_data)
 
         embed = disnake.Embed(
-            description="**Gerenciador de favoritos do usuário.**",
+            description="**Upravitelj omiljenih korisnika.**",
             colour=self.bot.get_color(),
         )
 
@@ -283,19 +283,19 @@ class FavManager(commands.Cog):
         await view.wait()
 
     @commands.cooldown(1, 5, commands.BucketType.user)
-    @commands.command(name="favlist", description="Exibir sua lista de favoritos.")
+    @commands.command(name="favlist", description="Pogledajte svoju listu favorita.")
     async def favlist_legacy(self, ctx: CustomContext):
         await self.list_.callback(self=self, inter=ctx, hidden=False)
 
     @commands.cooldown(1, 5, commands.BucketType.user)
     @fav.sub_command(
-        name="list", description=f"{desc_prefix}Exibir sua lista de favoritos."
+        name="list", description=f"{desc_prefix}Pogledajte svoju listu favorita."
     )
     async def list_(
             self, inter: disnake.ApplicationCommandInteraction,
             hidden: bool = commands.Param(
-                name="ocultar",
-                description="Apenas você pode ver a lista de favoritos.",
+                name="maskiranje",
+                description="Samo vi možete vidjeti listu favorita.",
                 default=False)
     ):
 
@@ -307,16 +307,16 @@ class FavManager(commands.Cog):
         user_data = await self.bot.get_global_data(inter.author.id, db_name=DBModel.users)
 
         if not user_data["fav_links"]:
-            raise GenericError(f"**Você não possui links favoritos..\n"
-                               f"Você pode adicionar usando o comando: /{self.fav.name} {self.manager.name}**")
+            raise GenericError(f"**Nemate omiljenih linkova..\n"
+                               f"Možete dodati pomoću naredbe: /{self.fav.name} {self.manager.name}**")
 
         embed = disnake.Embed(
             color=self.bot.get_color(),
-            title="Seus Links Favoritos:",
+            title="Vaši omiljeni linkovi:",
             description="\n".join(f"{n+1}) [`{f[0]}`]({f[1]})" for n, f in enumerate(user_data["fav_links"].items()))
         )
 
-        embed.set_footer(text="Você pode usá-los no comando /play")
+        embed.set_footer(text="Možete ih koristiti u komandi /play")
 
         if isinstance(inter, CustomContext):
             await inter.send(embed=embed)
@@ -326,20 +326,20 @@ class FavManager(commands.Cog):
     fav_import_export_cd = commands.CooldownMapping.from_cooldown(1, 15, commands.BucketType.member)
 
     @fav.sub_command(
-        name="import", description=f"{desc_prefix}Importar seus favoritos a partir de um arquivo.",
+        name="import", description=f"{desc_prefix}Uvezite svoje oznake iz datoteke.",
         cooldown=fav_import_export_cd
     )
     async def import_(
             self,
             inter: disnake.ApplicationCommandInteraction,
-            file: disnake.Attachment = commands.Param(name="arquivo", description="arquivo em formato .json")
+            file: disnake.Attachment = commands.Param(name="fajl", description="datoteka u .json formatu")
     ):
 
         if file.size > 2097152:
-            raise GenericError("**O tamanho do arquivo não pode ultrapassar 2Mb!**")
+            raise GenericError("**Veličina fajla ne može biti veća od 2Mb!**")
 
         if not file.filename.endswith(".json"):
-            raise GenericError("**Tipo de arquivo inválido!**")
+            raise GenericError("**Nevažeći tip datoteke!**")
 
         await inter.response.defer(ephemeral=True)
 
@@ -347,7 +347,7 @@ class FavManager(commands.Cog):
             data = (await file.read()).decode('utf-8')
             json_data = json.loads(data)
         except Exception as e:
-            raise GenericError("**Ocorreu um erro ao ler o arquivo, por favor revise-o e use o comando novamente.**\n"
+            raise GenericError("**Došlo je do greške pri čitanju datoteke, pregledajte je i ponovo koristite naredbu.**\n"
                                f"```py\n{repr(e)}```")
 
         for name, url in json_data.items():
@@ -356,16 +356,16 @@ class FavManager(commands.Cog):
                 continue
 
             if len(url) > (max_url_chars := self.bot.config["USER_FAV_MAX_URL_LENGTH"]):
-                raise GenericError(f"**Um item de seu arquivo {url} ultrapassa a quantidade de caracteres permitido:{max_url_chars}**")
+                raise GenericError(f"**Stavka iz vašeg fajla {url} premašuje dozvoljeni broj znakova:{max_url_chars}**")
 
             if not isinstance(url, str) or not URL_REG.match(url):
-                raise GenericError(f"O seu arquivo contém link inválido: ```ldif\n{url}```")
+                raise GenericError(f"Vaš fajl sadrži nevažeći link: ```ldif\n{url}```")
 
         user_data = await self.bot.get_global_data(inter.author.id, db_name=DBModel.users)
 
         for name in json_data.keys():
             if len(name) > (max_name_chars := self.bot.config["USER_FAV_MAX_NAME_LENGTH"]):
-                raise GenericError(f"**Um item de seu arquivo ({name}) ultrapassa a quantidade de caracteres permitido:{max_name_chars}**")
+                raise GenericError(f"**Stavka iz vašeg fajla ({name}) premašuje dozvoljeni broj znakova:{max_name_chars}**")
             try:
                 del user_data["fav_links"][name.lower()]
             except KeyError:
@@ -374,14 +374,14 @@ class FavManager(commands.Cog):
         if self.bot.config["MAX_USER_FAVS"] > 0 and not (await self.bot.is_owner(inter.author)):
 
             if (json_size:=len(json_data)) > self.bot.config["MAX_USER_FAVS"]:
-                raise GenericError(f"A quantidade de itens no seu arquivo de favorito excede "
-                                   f"a quantidade máxima permitida ({self.bot.config['MAX_USER_FAVS']}).")
+                raise GenericError(f"Broj stavki u vašoj datoteci oznaka premašuje "
+                                   f"maksimalno dozvoljeni iznos ({self.bot.config['MAX_USER_FAVS']}).")
 
             if (json_size + (user_favs:=len(user_data["fav_links"]))) > self.bot.config["MAX_USER_FAVS"]:
-                raise GenericError("Você não possui espaço suficiente para adicionar todos os favoritos de seu arquivo...\n"
-                                   f"Limite atual: {self.bot.config['MAX_USER_FAVS']}\n"
-                                   f"Quantidade de favoritos salvos: {user_favs}\n"
-                                   f"Você precisa de: {(json_size + user_favs)-self.bot.config['MAX_USER_FAVS']}")
+                raise GenericError("Nemate dovoljno prostora da dodate sve oznake u svoj fajl...\n"
+                                   f"Limit: {self.bot.config['MAX_USER_FAVS']}\n"
+                                   f"Broj sačuvanih favorita: {user_favs}\n"
+                                   f"Trebaš da: {(json_size + user_favs)-self.bot.config['MAX_USER_FAVS']}")
 
         user_data["fav_links"].update(json_data)
 
@@ -390,13 +390,13 @@ class FavManager(commands.Cog):
         await inter.edit_original_message(
             embed = disnake.Embed(
                 color=self.bot.get_color(),
-                description = "**Os links foram importados com sucesso!**\n"
-                              "**Eles vão aparecer quando usar o comando /play (no preenchimento automático da busca).**",
+                description = "**Linkovi su uspješno uvezeni!**\n"
+                              "**Oni će se pojaviti kada koristite naredbu /play (pri automatskom dovršavanju pretraživanja).**",
             )
         )
 
     @fav.sub_command(
-        description=f"{desc_prefix}Exportar seus favoritos em um arquivo json.",
+        description=f"{desc_prefix}Izvezite svoje oznake u json datoteku.",
         cooldown=fav_import_export_cd
     )
     async def export(self, inter: disnake.ApplicationCommandInteraction):
@@ -406,13 +406,13 @@ class FavManager(commands.Cog):
         user_data = await self.bot.get_global_data(inter.author.id, db_name=DBModel.users)
 
         if not user_data["fav_links"]:
-            raise GenericError(f"**Você não possui links favoritos..\n"
-                               f"Você pode adicionar usando o comando: /{self.fav.name} {self.manager.name}**")
+            raise GenericError(f"**Nemate omiljenih linkova..\n"
+                               f"Možete dodati pomoću naredbe: /{self.fav.name} {self.manager.name}**")
 
         fp = BytesIO(bytes(json.dumps(user_data["fav_links"], indent=4), 'utf-8'))
 
         embed = disnake.Embed(
-            description=f"Seus favoritos estão aqui.\nVocê pode importar usando o comando: `/{self.import_.name}`",
+            description=f"Vaše oznake su ovdje.\Možete uvesti pomoću naredbe: `/{self.import_.name}`",
             color=self.bot.get_color())
 
         await inter.edit_original_message(embed=embed, file=disnake.File(fp=fp, filename="favoritos.json"))
