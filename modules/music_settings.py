@@ -192,7 +192,7 @@ class MusicSettings(commands.Cog):
             self,
             inter: disnake.AppCmdInter,
             target: Union[disnake.TextChannel, disnake.VoiceChannel, disnake.ForumChannel, disnake.StageChannel] = commands.Param(
-                name="Kanal", default=None, description="Odaberite postojeći kanal"
+                name="kanal", default=None, description="Odaberite postojeći kanal"
             ),
             purge_messages: str = commands.Param(
                 name="limpar_mensagens", default="no",
