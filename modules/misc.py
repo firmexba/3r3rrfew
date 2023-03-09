@@ -190,7 +190,7 @@ class Misc(commands.Cog):
         guild = bot.get_guild(inter.guild_id) or inter.guild
 
         embed = disnake.Embed(
-            description=f"**Sobre mim:**\n\n",
+            description=f"**O meni:**\n\n",
             color=bot.get_color(inter.guild.me if inter.guild else guild.me)
         )
 
@@ -202,12 +202,12 @@ class Misc(commands.Cog):
                 active_players_other_bots += len(b.music.players)
 
             if active_players_other_bots:
-                embed.description += f"> **Players ativos (todos os bots):** `{active_players_other_bots}`\n"
+                embed.description += f"> **Aktivni botovi (svi botovi):** `{active_players_other_bots}`\n"
 
         else:
 
             if bot.music.players:
-                embed.description += f"> **Players ativos (bot atual):** `{len(bot.music.players)}`\n"
+                embed.description += f"> **Aktivni botovi (stvarni botovi):** `{len(bot.music.players)}`\n"
 
             for b in self.bot.pool.bots:
                 if b.user.id == bot.user.id:
@@ -215,15 +215,15 @@ class Misc(commands.Cog):
                 active_players_other_bots += len(b.music.players)
 
             if active_players_other_bots:
-                embed.description += f"> **Players ativos (outros bots):** `{active_players_other_bots}`\n"
+                embed.description += f"> **Aktivni botovi (drugi botovi):** `{active_players_other_bots}`\n"
 
         if bot.pool.commit:
-            embed.description += f"> **Commit atual:** [`{bot.pool.commit[:7]}`]({bot.pool.remote_git_url}/commit/{bot.pool.commit})\n"
+            embed.description += f"> **trenutna predaja:** [`{bot.pool.commit[:7]}`]({bot.pool.remote_git_url}/commit/{bot.pool.commit})\n"
 
-        embed.description += f"> **Versão do Python:** `{platform.python_version()}`\n" \
-                             f"> **Versão do Disnake:** `{disnake.__version__}`\n" \
-                             f"> **Latencia:** `{round(bot.latency * 1000)}ms`\n" \
-                             f"> **Uso de RAM:** `{ram_usage}`\n" \
+        embed.description += f"> **Python:** `{platform.python_version()}`\n" \
+                             f"> **Disnake:** `{disnake.__version__}`\n" \
+                             f"> **Latencija:** `{round(bot.latency * 1000)}ms`\n" \
+                             f"> ** RAM:** `{ram_usage}`\n" \
                              f"> **Uptime:** <t:{int(bot.uptime.timestamp())}:R>\n"
 
         if bot.config["GLOBAL_PREFIX"]:
@@ -235,9 +235,9 @@ class Misc(commands.Cog):
         prefix = guild_data["prefix"] or bot.default_prefix
 
         if bot.default_prefix and not bot.config["INTERACTION_COMMAND_ONLY"]:
-            embed.description += f"> **Prefixo:** `{disnake.utils.escape_markdown(prefix, as_needed=True)}`\n"
+            embed.description += f"> **Prefix:** `{disnake.utils.escape_markdown(prefix, as_needed=True)}`\n"
 
-        links = "[`[Source]`](https://github.com/zRitsu/disnake-LL-music-bot)"
+        links = "[`[Hvala na korištenju bota]`](#)"
 
         if bot.config["SUPPORT_SERVER"]:
             links += f" **|** [`[Suporte]`]({bot.config['SUPPORT_SERVER']})"
@@ -251,10 +251,10 @@ class Misc(commands.Cog):
 
         embed.set_footer(
             icon_url=avatar,
-            text=f"Dono(a): {bot.owner}"
+            text=f"Owner: {bot.owner}"
         )
 
-        components = [disnake.ui.Button(custom_id="bot_invite", label="Me adicione no seu servidor")] if [b for b in bot.pool.bots if b.appinfo and b.appinfo.bot_public] else None
+        components = [disnake.ui.Button(custom_id="bot_invite", label="Dodaj me na svoj server")] if [b for b in bot.pool.bots if b.appinfo and b.appinfo.bot_public] else None
 
         try:
             await inter.edit_original_message(embed=embed, components=components)
@@ -307,7 +307,7 @@ class Misc(commands.Cog):
             txt += "\n"
 
         if bots_in_guild:
-            txt += "**Bots de música que já estão no servidor atual:**\n"
+            txt += "**Glazbeni botovi koji su već na trenutnom poslužitelju:**\n"
             for i in disnake.utils.as_chunks(bots_in_guild, 2):
                 txt += " | ".join(i) + "\n"
 
