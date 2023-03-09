@@ -110,7 +110,7 @@ class EmbedPaginator(disnake.ui.View):
 
         if interaction.author != self.ctx.author:
             await interaction.send(
-                f"Apenas o membro {self.ctx.author.mention} pode usar os botões dessa mensagem...",
+                f"Samo član {self.ctx.author.mention} može koristiti naredbe u toj poruci....",
                 ephemeral=True
             )
             return False
@@ -135,7 +135,7 @@ class EmbedPaginator(disnake.ui.View):
             self.current += 1
         await interaction.response.edit_message(embed=self.embeds[self.current])
 
-    @disnake.ui.button(emoji='⏹️', style=disnake.ButtonStyle.red, label="Fechar")
+    @disnake.ui.button(emoji='⏹️', style=disnake.ButtonStyle.red, label="Zatvoriti")
     async def close(self, button, interaction: disnake.MessageInteraction):
 
         await interaction.message.delete()
@@ -159,11 +159,11 @@ def sync_message(bot: BotCore):
     app_commands_invite = f"https://discord.com/api/oauth2/authorize?client_id={bot.user.id}&scope=applications.commands"
     bot_invite = disnake.utils.oauth_url(bot.user.id, permissions=disnake.Permissions(bot.config['INVITE_PERMISSIONS']), scopes=('bot', 'applications.commands'))
 
-    return f"`Caso os comandos de barra não apareçam,` [`clique aqui`]({app_commands_invite}) `para me permitir " \
-           "criar comandos de barra no servidor.`\n\n" \
-           "`Nota: Em alguns casos os comandos de barra podem demorar até uma hora pra aparecer/atualizar em todos " \
-           "os servidores. Caso queira usar os comandos de barra imediatamente no servidor você terá que " \
-           f"me expulsar do servidor e em seguida me adicionar novamente através deste` [`link`]({bot_invite})..."
+    return f"`Ako se komande kose crte ne pojavljuju,` [`kliknite ovdje`]({app_commands_invite}) `da mi dozvolite, " \
+           "kreirajte komande kose crte na serveru.`\n\n" \
+           "Napomena: U nekim slučajevima komandama kose crte može proći i do sat vremena da se pojave/ažuriraju sve" \
+           "servere. Ako želite da koristite komande kosih crta odmah na serveru, moraćete " \
+           f"izbaci me sa servera i onda me vrati kroz ovo` [`link`]({bot_invite})..."
 
 
 def chunk_list(lst: list, amount: int):
@@ -264,15 +264,15 @@ async def send_idle_embed(
     if not guild_data:
         guild_data = await bot.get_data(target.guild.id, db_name=DBModel.guilds)
 
-    embed = disnake.Embed(description="**Entre em um canal de voz e peça uma música aqui " +
-                                      ("no post" if is_forum else "no canal ou na conversa abaixo") +
-                                      " (ou clique no botão abaixo ou use o comando /play aqui ou em algum outro canal)**\n\n"
-                                      "**Você pode usar um nome ou um link de site compatível:**"
+    embed = disnake.Embed(description="**Pridružite se glasovnom kanalu i zatražite pjesmu ovdje " +
+                                      ("bez objave" if is_forum else "na kanalu ili u razgovoru ispod") +
+                                      " (ili kliknite na dugme ispod ili koristite naredbu /play ovdje ili na nekom drugom kanalu)**\n\n"
+                                      "**Možete koristiti kompatibilno ime ili vezu do web stranice:**"
                                       " ```ansi\n[31;1mYoutube[0m, [33;1mSoundcloud[0m, [32;1mSpotify[0m, [34;1mTwitch[0m```\n",
                           color=bot.get_color(target.guild.me))
 
     if text:
-        embed.description += f"**ÚLTIMA AÇÃO:** {text.replace('**', '')}\n"
+        embed.description += f"**POSLEDNJA AKCIJA:** {text.replace('**', '')}\n"
 
     embed.set_thumbnail(target.guild.me.display_avatar.replace(size=256).url)
 
@@ -283,7 +283,7 @@ async def send_idle_embed(
     if opts:
         components.append(
             disnake.ui.Select(
-                placeholder="Músicas/Playlists do servidor.",
+                placeholder="Pjesme/liste za reprodukciju.",
                 options=opts, custom_id="player_guild_pin",
                 min_values=0, max_values=1
             )
@@ -294,12 +294,12 @@ async def send_idle_embed(
             disnake.ui.Button(
                 emoji="🎶",
                 custom_id=PlayerControls.add_song,
-                label="Pedir uma música"
+                label="Zatraži pjesmu"
             ),
             disnake.ui.Button(
                 emoji="⭐",
                 custom_id=PlayerControls.enqueue_fav,
-                label="Tocar favorito"
+                label="Pusti favorite"
             )
         ]
     )
@@ -363,17 +363,17 @@ async def select_bot_pool(inter, first=False):
             for b in inter.bot.pool.bots if b.appinfo.bot_public)
 
         if bot_invites:
-            raise GenericError(f"**Será necessário adicionar no servidor pelo menos um dos bots abaixo para usar "
-                               f"meus comandos:**\n{bot_invites}")
+            raise GenericError(f"**Morat ćete dodati barem jednog od dolje navedenih botova na server za korištenje "
+                               f"moje komande:**\n{bot_invites}")
         else:
-            raise GenericError("**Não há bots compatíveis com meus comandos no servidor...**")
+            raise GenericError("**Na serveru nema botova kompatibilnih sa mojim komandama...**")
 
     if len(bots) == 1 or first:
         return inter, list(bots.values())[0]
     else:
         opts = [disnake.SelectOption(label=f"{b.user}", value=f"{b.user.id}", emoji="🎶") for b in bots.values()]
 
-        opts.append(disnake.SelectOption(label="Cancelar", value="cancel", emoji="❌"))
+        opts.append(disnake.SelectOption(label="Otkaži", value="cancel", emoji="❌"))
 
         try:
             add_id = f"_{inter.id}"
@@ -382,8 +382,8 @@ async def select_bot_pool(inter, first=False):
 
         embed = disnake.Embed(
             color=inter.bot.get_color(),
-            description="**Selecione um bot abaixo:**\n"
-                        f'Nota: você tem apenas <t:{int((disnake.utils.utcnow() + datetime.timedelta(seconds=45)).timestamp())}:R> para escolher!'
+            description="**Odaberite bota ispod:**\n"
+                        f'Napomena: imate samo <t:{int((disnake.utils.utcnow() + datetime.timedelta(seconds=45)).timestamp())}:R> izabrati!'
         )
 
         msg = await inter.send(
@@ -409,7 +409,7 @@ async def select_bot_pool(inter, first=False):
             )
         except asyncio.TimeoutError:
             try:
-                await msg.edit(conent="Tempo de seleção esgotado!", embed=None, view=None)
+                await msg.edit(conent="Vrijeme odabira je isteklo!", embed=None, view=None)
             except:
                 pass
             return None, None
@@ -422,7 +422,7 @@ async def select_bot_pool(inter, first=False):
         if inter.data.values[0] == "cancel":
             await func(
                 embed=disnake.Embed(
-                    description="**Seleção cancelada!**",
+                    description="**Izbor poništen!**",
                     color=inter.bot.get_color()
                 ),
                 components=None
@@ -435,7 +435,7 @@ async def select_bot_pool(inter, first=False):
         try:
             return inter, bots[int(inter.data.values[0])]
         except KeyError:
-            raise GenericError("**O bot selecionado foi removido do servidor antes de sua seleção...**")
+            raise GenericError("** Odabrani bot je uklonjen sa servera prije odabira...**")
 
 def queue_track_index(inter: disnake.AppCmdInter, bot: BotCore, query: str, check_all: bool = False):
 
