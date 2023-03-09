@@ -27,7 +27,7 @@ class Misc(commands.Cog):
         self.extra_user_bots = []
         self.extra_user_bots_ids = [int(i) for i in bot.config['ADDITIONAL_BOT_IDS'].split() if i.isdigit()]
 
-    desc_prefix = "🔰 [Outros] 🔰 | "
+    desc_prefix = "🔰 [Drugi] 🔰 | "
 
 
     def placeholders(self, text: str):
@@ -116,7 +116,7 @@ class Misc(commands.Cog):
             await guild.leave()
 
         if self.bot.config["GLOBAL_PREFIX"]:
-            components = [disnake.ui.Button(custom_id="bot_invite", label="Precisa de mais bots de música? Clique aqui.")] if [b for b in self.bot.pool.bots if b.appinfo and b.appinfo.bot_public] else None
+            components = [disnake.ui.Button(custom_id="bot_invite", label="Trebate još muzičkih botova? Kliknite ovdje.")] if [b for b in self.bot.pool.bots if b.appinfo and b.appinfo.bot_public] else None
         else:
             components = []
 
@@ -137,22 +137,22 @@ class Misc(commands.Cog):
                 interaction_invites.append(f"[`{disnake.utils.escape_markdown(str(b.user.name))}`]({disnake.utils.oauth_url(b.user.id, scopes=['applications.commands'])}) ")
 
             if interaction_invites:
-                embed.description += f"Olá! Para ver todos os meus comandos digite barra (**/**) e confira " \
-                                     f"os comandos das seguintes aplicações abaixo:\n" \
+                embed.description += f"Zdravo! Da vidite sve moje komande ukucajte kosu (**/**) i provjeri " \
+                                     f"naredbe sljedećih aplikacija u nastavku:\n" \
                                      f"{' **|** '.join(interaction_invites)}\n\n" \
-                                     f"Caso os comandos da aplicação acima não sejam exibidos ao digitar " \
-                                     f"barra (**/**) você terá que clicar no nome acima para integrar os comandos de " \
-                                     f"barra no seu servidor.\n\n"
+                                     f"Ako se gornje naredbe aplikacije ne prikazuju prilikom kucanja " \
+                                     f"van (**/**) moraćete da kliknete na ime iznad da integrišete komande iz " \
+                                     f"bar na vašem serveru.\n\n"
 
             else:
-                embed.description += "Olá! Para ver todos os meus comandos use barra (**/**)\n\n"
+                embed.description += "Zdravo! Da vidite sve moje komande koristite kosu crtu (**/**)\n\n"
 
         if cmd:=self.bot.get_command("setup"):
-            embed.description += f"Se desejar, use o comando **/{cmd.name}** para criar um canal dedicado pra pedir " \
-                                 "músicas sem comandos e deixar o music player fixo em um canal dedicado.\n\n"
+            embed.description += f"Ako želite, koristite naredbu **/{cmd.name}** da kreirate namenski kanal za postavljanje pitanja " \
+                                 "pesme bez komandi i ostavite muzički plejer fiksiran na namenskom kanalu.\n\n"
 
         if self.bot.config["SUPPORT_SERVER"]:
-            embed.description += f"Caso tenha alguma dúvida ou queira acompanhar as últimas novidades, você pode entrar no meu [`servidor de suporte`]({self.bot.config['SUPPORT_SERVER']})\n\n"
+            embed.description += f"Ako imate bilo kakvih pitanja ili želite biti u toku sa najnovijim vijestima, možete unijeti moj [`server za podršku`]({self.bot.config['SUPPORT_SERVER']})\n\n"
 
         try:
             await guild.system_channel.send(embed=embed, components=components)
@@ -164,14 +164,14 @@ class Misc(commands.Cog):
 
     about_cd = commands.CooldownMapping.from_cooldown(1, 5, commands.BucketType.member)
 
-    @commands.command(name="about", aliases=["sobre", "info", "botinfo"], description="Exibir informações sobre mim.",
+    @commands.command(name="about", aliases=["sobre", "info", "botinfo"], description="Pogledaj informacije o meni.",
                       cooldown=about_cd)
     async def about_legacy(self, ctx):
         await self.about.callback(self=self, inter=ctx)
 
 
     @commands.slash_command(
-        description=f"{desc_prefix}Exibir informações sobre mim.", cooldown=about_cd
+        description=f"{desc_prefix}Pogledaj informacije o meni.", cooldown=about_cd
     )
     async def about(
             self,
@@ -190,7 +190,7 @@ class Misc(commands.Cog):
         guild = bot.get_guild(inter.guild_id) or inter.guild
 
         embed = disnake.Embed(
-            description=f"**Sobre mim:**\n\n",
+            description=f"**O meni:**\n\n",
             color=bot.get_color(inter.guild.me if inter.guild else guild.me)
         )
 
@@ -202,12 +202,12 @@ class Misc(commands.Cog):
                 active_players_other_bots += len(b.music.players)
 
             if active_players_other_bots:
-                embed.description += f"> **Players ativos (todos os bots):** `{active_players_other_bots}`\n"
+                embed.description += f"> **Aktivni botovi (svi botovi):** `{active_players_other_bots}`\n"
 
         else:
 
             if bot.music.players:
-                embed.description += f"> **Players ativos (bot atual):** `{len(bot.music.players)}`\n"
+                embed.description += f"> **Aktivni botovi (trenutni bot):** `{len(bot.music.players)}`\n"
 
             for b in self.bot.pool.bots:
                 if b.user.id == bot.user.id:
@@ -215,15 +215,15 @@ class Misc(commands.Cog):
                 active_players_other_bots += len(b.music.players)
 
             if active_players_other_bots:
-                embed.description += f"> **Players ativos (outros bots):** `{active_players_other_bots}`\n"
+                embed.description += f"> **Aktivni botovi (ostali botovi):** `{active_players_other_bots}`\n"
 
         if bot.pool.commit:
-            embed.description += f"> **Commit atual:** [`{bot.pool.commit[:7]}`]({bot.pool.remote_git_url}/commit/{bot.pool.commit})\n"
+            embed.description += f"> **Trenutno:** [`{bot.pool.commit[:7]}`]({bot.pool.remote_git_url}/commit/{bot.pool.commit})\n"
 
-        embed.description += f"> **Versão do Python:** `{platform.python_version()}`\n" \
-                             f"> **Versão do Disnake:** `{disnake.__version__}`\n" \
-                             f"> **Latencia:** `{round(bot.latency * 1000)}ms`\n" \
-                             f"> **Uso de RAM:** `{ram_usage}`\n" \
+        embed.description += f"> **Python:** `{platform.python_version()}`\n" \
+                             f"> **Disnake:** `{disnake.__version__}`\n" \
+                             f"> **Latencija:** `{round(bot.latency * 1000)}ms`\n" \
+                             f"> **RAM:** `{ram_usage}`\n" \
                              f"> **Uptime:** <t:{int(bot.uptime.timestamp())}:R>\n"
 
         if bot.config["GLOBAL_PREFIX"]:
@@ -235,12 +235,12 @@ class Misc(commands.Cog):
         prefix = guild_data["prefix"] or bot.default_prefix
 
         if bot.default_prefix and not bot.config["INTERACTION_COMMAND_ONLY"]:
-            embed.description += f"> **Prefixo:** `{disnake.utils.escape_markdown(prefix, as_needed=True)}`\n"
+            embed.description += f"> **Prefix:** `{disnake.utils.escape_markdown(prefix, as_needed=True)}`\n"
 
         links = "[`[Hvala na koristenju]`](#)"
 
         if bot.config["SUPPORT_SERVER"]:
-            links += f" **|** [`[Suporte]`]({bot.config['SUPPORT_SERVER']})"
+            links += f" **|** [`[podrška]`]({bot.config['SUPPORT_SERVER']})"
 
         embed.description += f">  {links}\n"
 
@@ -251,10 +251,10 @@ class Misc(commands.Cog):
 
         embed.set_footer(
             icon_url=avatar,
-            text=f"Dono(a): {bot.owner}"
+            text=f"Koji: {bot.owner}"
         )
 
-        components = [disnake.ui.Button(custom_id="bot_invite", label="Me adicione no seu servidor")] if [b for b in bot.pool.bots if b.appinfo and b.appinfo.bot_public] else None
+        components = [disnake.ui.Button(custom_id="bot_invite", label="dodaj me na svoj server")] if [b for b in bot.pool.bots if b.appinfo and b.appinfo.bot_public] else None
 
         try:
             await inter.edit_original_message(embed=embed, components=components)
@@ -301,13 +301,13 @@ class Misc(commands.Cog):
         txt = ""
 
         if bots_invites:
-            txt += "**Bots de música disponíveis:**\n"
+            txt += "**Dostupni muzički botovi:**\n"
             for i in disnake.utils.as_chunks(bots_invites, 2):
                 txt += " | ".join(i) + "\n"
             txt += "\n"
 
         if bots_in_guild:
-            txt += "**Bots de música que já estão no servidor atual:**\n"
+            txt += "**Muzički botovi koji su već na trenutnom serveru:**\n"
             for i in disnake.utils.as_chunks(bots_in_guild, 2):
                 txt += " | ".join(i) + "\n"
 
@@ -317,7 +317,7 @@ class Misc(commands.Cog):
                     colour=self.bot.get_color(
                         inter.guild.me if inter.guild else guild.me if guild else None
                     ),
-                    title="**Não há bots públicos disponível...**",
+                    title="**Nema dostupnih javnih botova...**",
                 ), ephemeral=True
             )
             return
@@ -345,7 +345,7 @@ class Misc(commands.Cog):
                 traceback.print_exc()
 
         if interaction_bots:
-            txt = f"**Registrar os comandos de barra no servidor:**\n{interaction_bots}\n\n" + txt
+            txt = f"**Registrujte komande kose crte na serveru:**\n{interaction_bots}\n\n" + txt
 
         await inter.send(
             embed=disnake.Embed(
@@ -357,13 +357,13 @@ class Misc(commands.Cog):
         )
 
 
-    @commands.command(name="invite", aliases=["convidar"], description="Exibir meu link de convite para você me adicionar no seu servidor.")
+    @commands.command(name="invite", aliases=["convidar"], description="Prikaži moj link za pozivnicu da me dodate na svoj server.")
     async def invite_legacy(self, ctx):
         await self.invite.callback(self=self, inter=ctx)
 
 
     @commands.slash_command(
-        description=f"{desc_prefix}Exibir meu link de convite para você me adicionar no seu servidor."
+        description=f"{desc_prefix}Prikaži moj link za pozivnicu da me dodate na svoj server."
     )
     async def invite(self, inter: disnake.AppCmdInter):
 
@@ -419,12 +419,12 @@ class GuildLog(commands.Cog):
             if URL_REG.match(bot.config["BOT_ADD_REMOVE_LOG"]):
                 self.hook_url = bot.config["BOT_ADD_REMOVE_LOG"]
             else:
-                print("URL do webhook inválido (para envio de logs ao adicionar/remover bot).")
+                print("Nevažeći webhook URL (za isporuku dnevnika prilikom dodavanja/uklanjanja bota).")
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: disnake.Guild):
 
-        print(f"Removido do servidor: {guild.name} - [{guild.id}]")
+        print(f"uklonjen sa servera: {guild.name} - [{guild.id}]")
 
         try:
             await self.bot.music.players[guild.id].destroy()
@@ -435,7 +435,7 @@ class GuildLog(commands.Cog):
             return
 
         embed = disnake.Embed(
-            description=f"**Me removeram do servidor:**\n"
+            description=f"**Uklonjen sam sa servera:**\n"
                         f"```{guild.name}```\n"
                         f"**ID:** `{guild.id}`",
             color=disnake.Colour.red()
@@ -468,7 +468,7 @@ class GuildLog(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild: disnake.Guild):
 
-        print(f"Novo servidor: {guild.name} - [{guild.id}]")
+        print(f"novi server: {guild.name} - [{guild.id}]")
 
         try:
             guild_data = await self.bot.get_data(guild.id, db_name=DBModel.guilds)
@@ -483,13 +483,13 @@ class GuildLog(commands.Cog):
         created_at = int(guild.created_at.timestamp())
 
         embed =disnake.Embed(
-            description="__**Me adicionaram em um novo servidor:**__\n"
+            description="__**Dodao me na novi server:**__\n"
                         f"```{guild.name}```\n"
                         f"**ID:** `{guild.id}`\n"
-		                f"**Dono:** `{guild.owner}`\n"
-                        f"**Criado em:** <t:{created_at}:f> - <t:{created_at}:R>\n"
-		                f"**Nível de verificação:** `{guild.verification_level or 'nenhuma'}`\n"
-		                f"**Membros:** `{len([m for m in guild.members if not m.bot])}`\n"
+		                f"**Vlasnik:** `{guild.owner}`\n"
+                        f"**Kreirano u:** <t:{created_at}:f> - <t:{created_at}:R>\n"
+		                f"**Nivo verifikacije:** `{guild.verification_level or 'nenhuma'}`\n"
+		                f"**Clanovi:** `{len([m for m in guild.members if not m.bot])}`\n"
 		                f"**Bots:** `{len([m for m in guild.members if m.bot])}`\n",
             color=disnake.Colour.green()
         )
