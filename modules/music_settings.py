@@ -733,7 +733,7 @@ class MusicSettings(commands.Cog):
     async def remove_dj_role(
             self,
             inter: disnake.ApplicationCommandInteraction,
-            role: disnake.Role = commands.Param(name="Pozicija", description="Pozicija")
+            role: disnake.Role = commands.Param(name="pozicija", description="Pozicija")
     ):
 
         inter, bot = await select_bot_pool(inter)
