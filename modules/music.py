@@ -622,12 +622,12 @@ class Music(commands.Cog):
     @can_send_message_check()
     @check_voice()
     @commands.bot_has_guild_permissions(send_messages=True)
-    @pool_command(name="search", description="Pesquisar por músicas e escolher uma entre os resultados para tocar.",
+    @pool_command(name="search", description="Potražite pjesme i odaberite jednu od rezultata za reprodukciju.",
                   aliases=["sc"], check_player=False, cooldown=play_cd, max_concurrency=play_mc)
     async def search_legacy(self, ctx: CustomContext, *, query: str = None):
 
         if not query:
-            raise GenericError("**Você não adicionou um nome ou link para tocar.**")
+            raise GenericError("**Niste dodali ime ili link za pustiti.**")
 
         await self.play.callback(self=self, inter=ctx, query=query, position=0, options=False, force_play="no",
                                  manual_selection=True, source="ytsearch", repeat_amount=0, server=None)
@@ -636,29 +636,29 @@ class Music(commands.Cog):
     @check_voice()
     @commands.slash_command(
         name=disnake.Localized("play_nusic_file", data={disnake.Locale.pt_BR: "tocar_arquivo"}),
-        description=f"{desc_prefix}Tocar arquivo de música em um canal de voz.",
+        description=f"{desc_prefix}Pustite muzički fajl na glasovnom kanalu.",
         extras={"check_player": False}, cooldown=play_cd, max_concurrency=play_mc
     )
     async def play_file(
             self,
             inter: Union[disnake.AppCmdInter, CustomContext],
             file: disnake.Attachment = commands.Param(
-                name="arquivo", description="arquivo de audio para tocar ou adicionar na fila"
+                name="fajl", description="audio fajl za reprodukciju ili dodavanje u red čekanja"
             ),
-            position: int = commands.Param(name="posição", description="Colocar a música em uma posição específica",
+            position: int = commands.Param(name="pozicija", description="Postavite muziku u određenu poziciju",
                                            default=0),
             force_play: str = commands.Param(
                 name="tocar_agora",
-                description="Tocar a música imediatamente (ao invés de adicionar na fila).",
+                description="Pusti pjesmu odmah (umjesto dodavanja u red čekanja).",
                 default="no",
                 choices=[
-                    disnake.OptionChoice(disnake.Localized("Yes", data={disnake.Locale.pt_BR: "Sim"}), "yes"),
-                    disnake.OptionChoice(disnake.Localized("No", data={disnake.Locale.pt_BR: "Não"}), "no")
+                    disnake.OptionChoice(disnake.Localized("Yes", data={disnake.Locale.pt_BR: "Da"}), "yes"),
+                    disnake.OptionChoice(disnake.Localized("No", data={disnake.Locale.pt_BR: "Ne"}), "no")
                 ]
             ),
-            repeat_amount: int = commands.Param(name="repetições", description="definir quantidade de repetições.",
+            repeat_amount: int = commands.Param(name="ponavljanja", description="podesiti broj ponavljanja.",
                                                 default=0),
-            server: str = commands.Param(name="server", desc="Usar um servidor de música específico na busca.",
+            server: str = commands.Param(name="server", desc="Koristite određeni muzički server u pretrazi.",
                                          default=None),
     ):
 
@@ -674,36 +674,36 @@ class Music(commands.Cog):
     @check_voice()
     @commands.slash_command(
         name=disnake.Localized("play", data={disnake.Locale.pt_BR: "tocar"}),
-        description=f"{desc_prefix}Tocar música em um canal de voz.",
+        description=f"{desc_prefix}Pustite muziku na glasovnom kanalu.",
         extras={"check_player": False}, cooldown=play_cd, max_concurrency=play_mc
     )
     async def play(
             self,
             inter: Union[disnake.AppCmdInter, CustomContext],
-            query: str = commands.Param(name="busca", desc="Nome ou link da música."), *,
-            position: int = commands.Param(name="posição", description="Colocar a música em uma posição específica",
+            query: str = commands.Param(name="traži", desc="Naziv pjesme ili link."), *,
+            position: int = commands.Param(name="pozicija", description="Postavite muziku u određenu poziciju",
                                            default=0),
             force_play: str = commands.Param(
                 name="tocar_agora",
-                description="Tocar a música imediatamente (ao invés de adicionar na fila).",
+                description="Pusti pjesmu odmah (umjesto dodavanja u red čekanja).",
                 default="no",
                 choices=[
-                    disnake.OptionChoice(disnake.Localized("Yes", data={disnake.Locale.pt_BR: "Sim"}), "yes"),
-                    disnake.OptionChoice(disnake.Localized("No", data={disnake.Locale.pt_BR: "Não"}), "no")
+                    disnake.OptionChoice(disnake.Localized("Yes", data={disnake.Locale.pt_BR: "Da"}), "yes"),
+                    disnake.OptionChoice(disnake.Localized("No", data={disnake.Locale.pt_BR: "Ne"}), "no")
                 ]
             ),
             manual_selection: bool = commands.Param(name="selecionar_manualmente",
-                                                    description="Escolher uma música manualmente entre os resultados encontrados",
+                                                    description="Odaberite pjesmu ručno iz pronađenih rezultata",
                                                     default=False),
-            options: str = commands.Param(name="opções", description="Opções para processar playlist",
+            options: str = commands.Param(name="opcije", description="Opcije za obradu plejliste",
                                           choices=playlist_opts, default=False),
-            source: str = commands.Param(name="fonte",
-                                         description="Selecionar site para busca de músicas (não links)",
+            source: str = commands.Param(name="izvor",
+                                         description="Odaberite web lokaciju za pretraživanje muzike (ne linkove)",
                                          choices=search_sources_opts,
                                          default="ytsearch"),
-            repeat_amount: int = commands.Param(name="repetições", description="definir quantidade de repetições.",
+            repeat_amount: int = commands.Param(name="ponavljanja", description="podesiti broj ponavljanja.",
                                                 default=0),
-            server: str = commands.Param(name="server", desc="Usar um servidor de música específico na busca.",
+            server: str = commands.Param(name="server", desc="Koristite određeni muzički server u pretrazi.",
                                          default=None),
     ):
 
