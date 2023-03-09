@@ -101,7 +101,7 @@ class Owner(commands.Cog):
     @commands.is_owner()
     @commands.command(
         hidden=True, aliases=["gls", "lavalink", "lllist", "lavalinkservers"],
-        description="Baixar um arquivo com lista de servidores lavalink para usá-los no sistema de música."
+        description="Preuzmite datoteku sa listom lavalink servera da biste ih koristili na muzičkom sistemu."
     )
     async def getlavaservers(self, ctx: CustomContext):
 
@@ -111,8 +111,8 @@ class Owner(commands.Cog):
 
         await ctx.send(
             embed=disnake.Embed(
-                description="**O arquivo lavalink.ini foi baixado com sucesso!\n"
-                            "Será necessário me reiniciar para usar os servidores deste arquivo.**"
+                description="**Datoteka lavalink.ini je uspješno preuzeta!\n"
+                            "Morat ću se ponovo pokrenuti da koristim servere ove datoteke.**"
             )
         )
 
@@ -131,7 +131,7 @@ class Owner(commands.Cog):
                 continue
 
         if not node and "--force" not in args:
-            raise GenericError("**O servidor LOCAL não está sendo usado!**")
+            raise GenericError("**LOKALNI server se ne koristi!**")
 
         download_urls = [self.bot.config["LAVALINK_FILE_URL"]]
 
@@ -162,7 +162,7 @@ class Owner(commands.Cog):
 
                 for player in node.players.values():
 
-                    txt = "O servidor de música foi reiniciado e a música será retomada em alguns segundos (Por favor aguarde)..."
+                    txt = "Muzički server je ponovo pokrenut i muzika će se nastaviti za nekoliko sekundi (Molimo sačekajte)..."
 
                     if reset_ids:
 
@@ -192,7 +192,7 @@ class Owner(commands.Cog):
         for process in psutil.process_iter():
             try:
                 if "Lavalink.jar" in process.cmdline():
-                    print(f"{ctx.invoked_with} - Reiniciando lavalink...")
+                    print(f"{ctx.invoked_with} - ponovno pokretanje lavalinka...")
                     process.terminate()
                     run_lavalink(
                         lavalink_file_url=self.bot.config['LAVALINK_FILE_URL'],
@@ -207,14 +207,14 @@ class Owner(commands.Cog):
 
         await ctx.send(
             embed=disnake.Embed(
-                description="**O arquivo Lavalink.jar foi atualizado com sucesso!**",
+                description="**Datoteka Lavalink.jar je uspješno ažurirana!**",
                 color=self.bot.get_color(ctx.guild.me)
             )
         )
 
     @commands.is_owner()
-    @panel_command(aliases=["rd", "recarregar"], description="Recarregar os módulos.", emoji="🔄",
-                   alt_name="Carregar/Recarregar módulos.")
+    @panel_command(aliases=["rd", "recarregar"], description="ponovo učitajte module.", emoji="🔄",
+                   alt_name="Učitaj/Ponovo učitaj module.")
     async def reload(self, ctx: Union[CustomContext, disnake.MessageInteraction]):
 
         data = self.bot.load_modules()
@@ -232,13 +232,13 @@ class Owner(commands.Cog):
         txt = ""
 
         if data["loaded"]:
-            txt += f'**Módulos carregados:** ```ansi\n[0;34m{" [0;37m| [0;34m".join(data["loaded"])}```\n'
+            txt += f'**Učitani moduli:** ```ansi\n[0;34m{" [0;37m| [0;34m".join(data["loaded"])}```\n'
 
         if data["reloaded"]:
-            txt += f'**Módulos recarregados:** ```ansi\n[0;32m{" [0;37m| [0;32m".join(data["reloaded"])}```\n'
+            txt += f'**Ponovno učitani moduli:** ```ansi\n[0;32m{" [0;37m| [0;32m".join(data["reloaded"])}```\n'
 
         if not txt:
-            txt = "**Nenhum módulo encontrado...**"
+            txt = "**Nije pronađen nijedan modul...**"
 
         self.bot.pool.config = load_config()
 
