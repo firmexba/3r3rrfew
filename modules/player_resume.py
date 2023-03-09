@@ -176,21 +176,21 @@ class PlayerSession(commands.Cog):
                 guild = self.bot.get_guild(int(data["_id"]))
 
                 if not guild:
-                    print(f"{self.bot.user} - Player Ignorado: {data['_id']} | Servidor inexistente...")
+                    print(f"{self.bot.user} - Ignorirano: {data['_id']} | nepostojeći server...")
                     await database.delete_data(data['_id'], str(self.bot.user.id), collection="player_sessions")
                     continue
 
                 voice_channel = self.bot.get_channel(int(data["voice_channel"]))
 
                 if not voice_channel:
-                    print(f"{self.bot.user} - Player Ignorado: {guild.name} [{guild.id}]\nO canal de voz não existe...")
+                    print(f"{self.bot.user} - Ignorirano: {guild.name} [{guild.id}]\nGlasovni kanal ne postoji...")
                     await database.delete_data(data['_id'], str(self.bot.user.id), collection="player_sessions")
                     continue
 
                 try:
                     can_connect(voice_channel, guild=guild)
                 except Exception as e:
-                    print(f"{self.bot.user} - Player Ignorado: {guild.name} [{guild.id}]\n{repr(e)}")
+                    print(f"{self.bot.user} - Ignorirano: {guild.name} [{guild.id}]\n{repr(e)}")
                     await database.delete_data(data['_id'], str(self.bot.user.id), collection="player_sessions")
                     continue
 
@@ -206,7 +206,7 @@ class PlayerSession(commands.Cog):
                 try:
                     can_send_message(text_channel, self.bot.user)
                 except Exception:
-                    print(f"{self.bot.user} - Player Ignorado (falta de permissão) [Canal: {text_channel.name} | ID: {text_channel.id}] - [ {guild.name} - {guild.id} ]")
+                    print(f"{self.bot.user} - Ignorirano (nedostaje dozvola) [Kanal: {text_channel.name} | ID: {text_channel.id}] - [ {guild.name} - {guild.id} ]")
                     await database.delete_data(data['_id'], str(self.bot.user.id), collection="player_sessions")
                     continue
 
@@ -238,7 +238,7 @@ class PlayerSession(commands.Cog):
                         stage_title_template=data.get("stage_title_template")
                     )
                 except Exception:
-                    print(f"{self.bot.user} - Falha ao criar player: {guild.name} [{guild.id}]\n{traceback.format_exc()}")
+                    print(f"{self.bot.user} - Kreiranje plejera nije uspjelo: {guild.name} [{guild.id}]\n{traceback.format_exc()}")
                     await database.delete_data(data['_id'], str(self.bot.user.id), collection="player_sessions")
                     continue
 
@@ -337,7 +337,7 @@ class PlayerSession(commands.Cog):
                         await guild.me.edit(suppress=False)
 
                 player.set_command_log(
-                    text="O player foi restaurado com sucesso!",
+                    text="Plejer je uspješno vraćen!",
                     emoji="🔰"
                 )
 
@@ -358,10 +358,10 @@ class PlayerSession(commands.Cog):
                 else:
                     await player.process_next(start_position=float(data["position"]))
 
-                print(f"{self.bot.user} - Player Retomado: {guild.name} [{guild.id}]")
+                print(f"{self.bot.user} - Nastavio: {guild.name} [{guild.id}]")
 
         except Exception:
-            print(f"{self.bot.user} - Falha Crítica ao retomar players:\n{traceback.format_exc()}")
+            print(f"{self.bot.user} - Kritičan neuspjeh prilikom ponovnog pokretanja:\n{traceback.format_exc()}")
 
         self.bot.player_resumed = True
 
