@@ -264,15 +264,15 @@ async def send_idle_embed(
     if not guild_data:
         guild_data = await bot.get_data(target.guild.id, db_name=DBModel.guilds)
 
-    embed = disnake.Embed(description="**Entre em um canal de voz e peça uma música aqui " +
-                                      ("no post" if is_forum else "no canal ou na conversa abaixo") +
-                                      " (ou clique no botão abaixo ou use o comando /play aqui ou em algum outro canal)**\n\n"
-                                      "**Você pode usar um nome ou um link de site compatível:**"
+    embed = disnake.Embed(description="**Pridružite se glasovnom kanalu i zatražite pjesmu ovdje " +
+                                      ("bez objave" if is_forum else "na kanalu ili u razgovoru ispod") +
+                                      " (ili kliknite na dugme ispod ili koristite naredbu /play ovdje ili na nekom drugom kanalu)**\n\n"
+                                      "**Možete koristiti podržano ime ili link na web stranicu:**"
                                       " ```ansi\n[31;1mYoutube[0m, [33;1mSoundcloud[0m, [32;1mSpotify[0m, [34;1mTwitch[0m```\n",
                           color=bot.get_color(target.guild.me))
 
     if text:
-        embed.description += f"**ÚLTIMA AÇÃO:** {text.replace('**', '')}\n"
+        embed.description += f"**POSLEDNJA AKCIJA:** {text.replace('**', '')}\n"
 
     embed.set_thumbnail(target.guild.me.display_avatar.replace(size=256).url)
 
@@ -283,7 +283,7 @@ async def send_idle_embed(
     if opts:
         components.append(
             disnake.ui.Select(
-                placeholder="Músicas/Playlists do servidor.",
+                placeholder="Pjesme/liste za reprodukciju.",
                 options=opts, custom_id="player_guild_pin",
                 min_values=0, max_values=1
             )
@@ -294,12 +294,12 @@ async def send_idle_embed(
             disnake.ui.Button(
                 emoji="🎶",
                 custom_id=PlayerControls.add_song,
-                label="Pedir uma música"
+                label="Zatraži pjesmu"
             ),
             disnake.ui.Button(
                 emoji="⭐",
                 custom_id=PlayerControls.enqueue_fav,
-                label="Tocar favorito"
+                label="Pusti omiljene"
             )
         ]
     )
