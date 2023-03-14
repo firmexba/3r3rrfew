@@ -54,7 +54,7 @@ class DefaultStaticSkin:
         queue_img = ""
 
         try:
-            vc_txt = f"\n> *️⃣ **⠂Canal de voz:** {player.guild.me.voice.channel.mention}"
+            vc_txt = f"\n> *️⃣ **⠂U kanalu:** {player.guild.me.voice.channel.mention}"
         except AttributeError:
             pass
 
