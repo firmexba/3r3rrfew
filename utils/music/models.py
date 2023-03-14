@@ -612,10 +612,10 @@ class LavalinkPlayer(wavelink.Player):
             )
 
         embed = disnake.Embed(
-            description=f"**Não há músicas na fila... Adicione uma música ou use uma das opções abaixo.\n\n"
-                        f"Nota:** `O Player será desligado automaticamente` "
+            description=f"**Nema pjesama u redu čekanja... Dodajte pjesmu ili koristite jednu od opcija ispod.\n\n"
+                        f"Napomena:** `Player će se automatski isključiti` "
                         f"<t:{int((disnake.utils.utcnow() + datetime.timedelta(seconds=self.idle_timeout)).timestamp())}:R> "
-                        f"`caso nenhuma ação seja executada...`",
+                        f"`ako se ništa ne preduzme...`",
             color=self.bot.get_color(self.guild.me)
         )
 
@@ -649,7 +649,7 @@ class LavalinkPlayer(wavelink.Player):
 
         await asyncio.sleep(self.idle_timeout)
 
-        msg = "💤 **⠂O player foi desligado por inatividade...**"
+        msg = "💤 **⠂Plejer je isključen zbog neaktivnosti...**"
 
         if self.static or self.has_thread:
             self.command_log = msg
